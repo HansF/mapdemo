@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bereikbaarheid Gent met de trein – Vlaamse Ardennen</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+  :root { --blue:#0a4c94; --ink:#12395f; --line:rgba(60,100,140,.4); }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; font-family:"Segoe UI",Tahoma,sans-serif; color:var(--ink); }
+  #map { position:absolute; inset:0; background:#e8e6dd; }
+  .leaflet-tile-pane { filter:saturate(.55) brightness(1.06); }
+  .card { background:rgba(255,255,255,.93); border:1px solid var(--line); border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.14); }
+  #title { position:absolute; z-index:1000; left:14px; top:14px; background:var(--blue); color:#fff; border-radius:12px;
+           padding:10px 18px 10px 14px; display:flex; gap:14px; align-items:center; max-width:calc(100% - 420px); box-shadow:0 6px 18px rgba(0,0,0,.25); }
+  #title .ico { font-size:34px; line-height:1; padding-right:14px; border-right:1px solid rgba(255,255,255,.4); }
+  #title h1 { margin:0; font-size:clamp(17px,2.2vw,30px); letter-spacing:-.02em; }
+  #title h2 { margin:0; font-size:clamp(13px,1.5vw,20px); font-weight:600; }
+  #title p { margin:4px 0 0; font-size:12px; opacity:.92; }
+  #panel { position:absolute; z-index:1000; right:14px; top:14px; bottom:14px; width:340px; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
+  #panel > * { pointer-events:auto; }
+  .card { padding:12px 14px; }
+  .card h3 { margin:0 0 8px; font-size:15px; color:var(--blue); }
+  .row { display:flex; align-items:center; gap:8px; font-size:13px; margin:4px 0; }
+  .sw { width:26px; height:16px; border-radius:3px; border:1px solid rgba(0,0,0,.25); flex:none; }
+  .row .pct { margin-left:auto; font-variant-numeric:tabular-nums; opacity:.75; font-size:12px; }
+  .seg { display:flex; border:1px solid var(--blue); border-radius:8px; overflow:hidden; margin-bottom:8px; }
+  .seg button { flex:1; border:0; background:#fff; color:var(--blue); padding:6px 4px; font:inherit; font-size:13px; cursor:pointer; }
+  .seg button.on { background:var(--blue); color:#fff; }
+  label.opt { display:flex; gap:8px; align-items:center; font-size:13px; margin:6px 0; }
+  input[type=range] { width:100%; }
+  #list { flex:1; min-height:120px; display:flex; flex-direction:column; }
+  #q { width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:8px; font:inherit; font-size:13px; margin-bottom:6px; }
+  #stations { overflow:auto; flex:1; margin:0; padding:0; list-style:none; }
+  #stations li { display:flex; justify-content:space-between; gap:8px; padding:5px 4px; font-size:13px; border-bottom:1px solid rgba(0,0,0,.06); cursor:pointer; }
+  #stations li:nth-child(odd) { background:rgba(20,100,180,.05); }
+  #stations li:hover { background:rgba(20,100,180,.16); }
+  #stations b { white-space:nowrap; }
+  .note { font-size:11px; opacity:.7; margin-top:6px; line-height:1.35; }
+  #status { position:absolute; z-index:1000; left:14px; bottom:34px; padding:8px 12px; font-size:13px; max-width:420px; }
+  #hover { position:absolute; z-index:1000; left:14px; bottom:84px; padding:8px 12px; font-size:13px; display:none; }
+  .err { color:#b00020; }
+  .hubIcon { background:var(--blue); color:#fff; border:2px solid #fff; border-radius:7px; text-align:center; font-size:13px; line-height:22px; box-shadow:0 1px 4px rgba(0,0,0,.45); }
+  .lbl { background:rgba(255,255,255,.85); border:0; box-shadow:none; font-weight:700; font-size:12px; padding:0 4px; color:#10283f; }
+  .lbl::before { display:none; }
+  @media (max-width:900px) {
+    #panel { width:auto; left:14px; top:auto; height:46%; }
+    #title { max-width:calc(100% - 28px); } #status,#hover { bottom:48%; }
+  }
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<div id="title">
+  <div class="ico">🚆</div>
+  <div>
+    <h1>Bereikbaarheid Gent met de trein</h1>
+    <h2>Vlaamse Ardennen en ruime omgeving</h2>
+    <p>Kleuring = hoe dicht je bij een NMBS-station woont + hoe vlot je vanuit daar de trein naar Gent kan nemen</p>
+  </div>
+</div>
+
+<div id="hover" class="card"></div>
+<div id="status" class="card">Gegevens laden…</div>
+
+<div id="panel">
+  <div class="card" id="ctl">
+    <div class="seg">
+      <button id="mDist" class="on">Afstand tot station</button>
+      <button id="mTime">Totale reistijd naar Gent</button>
+    </div>
+    <div id="timeOpts" style="display:none">
+      <div class="row">Vervoer naar station: <b id="spdLbl"></b></div>
+      <input id="spd" type="range" min="4" max="45" step="1" value="15" />
+    </div>
+    <label class="opt"><input type="checkbox" id="hubsOnly" /> Enkel stations met rechtstreekse verbinding naar Gent</label>
+    <label class="opt"><input type="checkbox" id="showRail" checked /> Toon spoorlijnen &amp; stations (OSM)</label>
+    <label class="opt">Kaartlaag <input type="range" id="op" min="0.2" max="1" step="0.05" value="0.7" style="flex:1" /></label>
+  </div>
+
+  <div class="card" id="legend"></div>
+
+  <div class="card" id="list">
+    <h3>Indicatieve reistijd met de trein naar Gent</h3>
+    <input id="q" placeholder="Zoek station…" />
+    <ul id="stations"></ul>
+    <div class="note">Reistijden zijn indicatief (stations zonder gemeten tijd: schatting op basis van afstand). Bronnen: © OpenStreetMap-bijdragers (Overpass, ODbL) · gemeentegrenzen: Digitaal Vlaanderen / VRBG (geo.api.vlaanderen.be, Datavindplaats).</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/osmtogeojson@3.0.0-beta.5/osmtogeojson.js"></script>
+<script>
+const FLEMISH = ['Brakel','Horebeke','Kluisbergen','Kruisem','Lierde','Maarkedal','Oudenaarde','Ronse','Zottegem','Zwalm',
+  'Wortegem-Petegem','Geraardsbergen','Herzele','Sint-Lievens-Houtem','Galmaarden','Pajottegem','Gavere'];
+const WALLOON = ['Flobecq','Ellezelles','Frasnes-lez-Anvaing','Mont-de-l\'Enclus','Lessines','Ath'];
+const BBOX = [50.55, 3.2, 51.2, 4.3];            // S,W,N,E voor stations en spoor
+const GENT = { lat:51.0357, lon:3.7106 };        // Gent-Sint-Pieters
+const OVERPASS = ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+const COLORS = ['#2fa34b','#9ad94b','#ffe433','#ff9a2e','#e5392f','#99112e'];
+const DEFS = {
+  dist: { cuts:[5,10,15,20,25], unit:'km', title:'Afstand tot een NMBS-station',
+          names:['zeer goed','goed','matig','beperkt','slecht','zeer slecht'] },
+  time: { cuts:[30,45,60,75,90], unit:'min', title:'Geschatte reistijd naar Gent (deur tot deur)',
+          names:['zeer goed','goed','matig','beperkt','slecht','zeer slecht'] }
+};
+// Indicatieve treintijden (min) naar Gent-Sint-Pieters en stations met rechtstreekse verbinding
+const KNOWN = [
+  [/oudenaarde/i,17],[/ronse|renaix/i,33],[/geraardsbergen/i,36],[/zottegem/i,24],[/munkzwalm/i,28],[/lierde/i,32],
+  [/^aalst$/i,41],[/lessines|lessen/i,48],[/^ath$/i,54],[/frasnes/i,56],[/gavere/i,12],[/sint-denijs-boekel/i,20],
+  [/herzele/i,30],[/eine/i,21],[/galmaarden/i,40]
+];
+const HUBS = /oudenaarde|ronse|renaix|geraardsbergen|zottegem|munkzwalm|lierde|lessines|lessen|^ath$|frasnes|gavere|sint-denijs-boekel|herzele|eine$|galmaarden|^aalst$/i;
+
+const state = { mode:'dist', speed:15, hubsOnly:false };
+let stations = [], regionGeo = null, W = 0, H = 0, bounds = null, mercBox = null;
+let mask = null, overlay = null, railLayer, stLayer, lastCounts = [];
+
+const $ = id => document.getElementById(id);
+const map = L.map('map', { zoomControl:false }).setView([50.86, 3.73], 10);
+L.control.zoom({ position:'bottomleft' }).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'© OpenStreetMap-bijdragers · © Digitaal Vlaanderen (VRBG)' }).addTo(map);
+
+const setStatus = (t, err) => { $('status').innerHTML = t ? `<span class="${err?'err':''}">${t}</span>` : ''; $('status').style.display = t ? '' : 'none'; };
+
+async function cached(key, fn) {
+  try { const c = localStorage.getItem(key); if (c) return JSON.parse(c); } catch {}
+  const v = await fn();
+  try { localStorage.setItem(key, JSON.stringify(v)); } catch {}
+  return v;
+}
+async function overpass(q) {
+  let last;
+  for (const url of OVERPASS) {
+    try {
+      const r = await fetch(url, { method:'POST', body:'data=' + encodeURIComponent(q) });
+      if (r.ok) return r.json();
+      last = new Error('Overpass ' + r.status);
+    } catch (e) { last = e; }
+  }
+  throw last;
+}
+const bb = BBOX.join(',');
+
+async function loadRegion() {
+  const names = FLEMISH.map(n => `'${n}'`).join(',');
+  const url = 'https://geo.api.vlaanderen.be/VRBG/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=VRBG:Refgem'
+    + '&outputFormat=application/json&srsName=EPSG:4326&propertyName=NAAM&CQL_FILTER=' + encodeURIComponent(`NAAM IN (${names})`);
+  const flem = await cached('kaartje.vrbg.v1', async () => { const r = await fetch(url); if (!r.ok) throw new Error('VRBG ' + r.status); return r.json(); });
+  const q = `[out:json][timeout:90];relation["boundary"="administrative"]["admin_level"="8"]["name"~"^(${WALLOON.join('|')})$"](50.5,3.3,50.95,4.3);out geom;`;
+  const wal = await cached('kaartje.walloon.v1', async () => osmtogeojson(await overpass(q)));
+  const feats = [...flem.features, ...wal.features.filter(f => /Polygon/.test(f.geometry.type))];
+  return { type:'FeatureCollection', features:feats };
+}
+async function loadStations() {
+  const q = `[out:json][timeout:90];node["railway"~"^(station|halt)$"]["name"](${bb});out body;`;
+  const raw = await cached('kaartje.stations.v1', () => overpass(q));
+  const seen = new Set();
+  return raw.elements.filter(e => !e.tags.disused && !/subway|light_rail|tram/.test(e.tags.station || ''))
+    .filter(e => !seen.has(e.tags.name) && seen.add(e.tags.name))
+    .map(e => ({ name:e.tags.name, lat:e.lat, lon:e.lon }));
+}
+async function loadRail() {
+  const q = `[out:json][timeout:120];way["railway"="rail"][!"service"](${bb});out geom qt;`;
+  return cached('kaartje.rail.v1', async () => {
+    const d = await overpass(q);
+    return d.elements.filter(w => w.geometry).map(w => w.geometry.map(p => [+p.lat.toFixed(5), +p.lon.toFixed(5)]));
+  });
+}
+
+const km = (a, b) => {
+  const kx = Math.cos((a.lat + b.lat) * Math.PI / 360) * 111.32;
+  return Math.hypot((a.lon - b.lon) * kx, (a.lat - b.lat) * 110.57);
+};
+function prepStations() {
+  const g = stations.find(s => /gent-sint-pieters/i.test(s.name));
+  for (const s of stations) {
+    s.hub = HUBS.test(s.name);
+    const k = KNOWN.find(([re]) => re.test(s.name));
+    s.known = !!k;
+    s.train = /gent-sint-pieters/i.test(s.name) ? 0 : k ? k[1] : Math.round(3 + km(s, g || GENT) * 0.95);
+  }
+}
+
+// ---------- raster in Mercator-ruimte ----------
+function setupRaster() {
+  const crs = L.CRS.EPSG3857;
+  let minX = 1e12, minY = 1e12, maxX = -1e12, maxY = -1e12;
+  const each = (c, d, f) => d === 0 ? f(c) : c.forEach(x => each(x, d - 1, f));
+  for (const ft of regionGeo.features) {
+    const d = ft.geometry.type === 'Polygon' ? 2 : 3;
+    each(ft.geometry.coordinates, d, ([lon, lat]) => {
+      const p = crs.project(L.latLng(lat, lon));
+      minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
+    });
+  }
+  mercBox = { minX, minY, maxX, maxY };
+  W = 900; H = Math.round(W * (maxY - minY) / (maxX - minX));
+  const sw = crs.unproject(L.point(minX, minY)), ne = crs.unproject(L.point(maxX, maxY));
+  bounds = L.latLngBounds(sw, ne);
+  // maskerend: enkel binnen de regio inkleuren
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); x.fillStyle = '#000';
+  const tx = ([lon, lat]) => { const p = crs.project(L.latLng(lat, lon)); return [(p.x - minX) / (maxX - minX) * W, (maxY - p.y) / (maxY - minY) * H]; };
+  for (const ft of regionGeo.features) {
+    const polys = ft.geometry.type === 'Polygon' ? [ft.geometry.coordinates] : ft.geometry.coordinates;
+    x.beginPath();
+    for (const poly of polys) for (const ring of poly) {
+      ring.forEach((pt, i) => { const [px, py] = tx(pt); i ? x.lineTo(px, py) : x.moveTo(px, py); });
+      x.closePath();
+    }
+    x.fill('evenodd');
+  }
+  mask = x.getImageData(0, 0, W, H).data;
+  mask.tx = tx;
+}
+const insideRegion = s => {
+  const [px, py] = mask.tx([s.lon, s.lat]);
+  const ix = Math.round(px), iy = Math.round(py);
+  return ix >= 0 && iy >= 0 && ix < W && iy < H && mask[(iy * W + ix) * 4 + 3] > 128;
+};
+
+const candidates = () => stations.filter(s => !state.hubsOnly || s.hub || /gent-sint-pieters/i.test(s.name));
+const accessMin = d => d * 1.3 * 60 / state.speed;
+const value = (s, d) => state.mode === 'dist' ? d : accessMin(d) + s.train;
+const bandOf = v => { const c = DEFS[state.mode].cuts; let i = 0; while (i < c.length && v > c[i]) i++; return i; };
+
+function render() {
+  const cs = candidates(), crs = L.CRS.EPSG3857;
+  const out = new ImageData(W, H), px = out.data, counts = new Array(6).fill(0);
+  const { minX, minY, maxX, maxY } = mercBox;
+  const rgb = COLORS.map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)));
+  const colLon = new Float64Array(W);
+  for (let i = 0; i < W; i++) colLon[i] = crs.unproject(L.point(minX + (i + .5) / W * (maxX - minX), minY)).lng;
+  let total = 0;
+  for (let y = 0; y < H; y++) {
+    const lat = crs.unproject(L.point(minX, maxY - (y + .5) / H * (maxY - minY))).lat;
+    const kx = Math.cos(lat * Math.PI / 180) * 111.32;
+    for (let x = 0; x < W; x++) {
+      const o = (y * W + x) * 4;
+      if (mask[o + 3] < 128) continue;
+      let best = Infinity;
+      for (const s of cs) {
+        const d = Math.hypot((colLon[x] - s.lon) * kx, (lat - s.lat) * 110.57);
+        const v = value(s, d); if (v < best) best = v;
+      }
+      const b = bandOf(best); counts[b]++; total++;
+      px[o] = rgb[b][0]; px[o + 1] = rgb[b][1]; px[o + 2] = rgb[b][2]; px[o + 3] = 255;
+    }
+  }
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  c.getContext('2d').putImageData(out, 0, 0);
+  const url = c.toDataURL();
+  if (overlay) overlay.setUrl(url); else { overlay = L.imageOverlay(url, bounds, { opacity:+$('op').value, interactive:false }).addTo(map); overlay.bringToBack(); }
+  lastCounts = counts.map(n => total ? n / total : 0);
+  renderLegend(); renderList();
+}
+
+function renderLegend() {
+  const d = DEFS[state.mode], c = d.cuts, u = d.unit;
+  const lbl = i => i === 0 ? `0 – ${c[0]} ${u}` : i === c.length ? `> ${c[c.length - 1]} ${u}` : `${c[i - 1]} – ${c[i]} ${u}`;
+  $('legend').innerHTML = `<h3>${d.title}</h3>` + COLORS.map((col, i) =>
+    `<div class="row"><span class="sw" style="background:${col}"></span>${lbl(i)} <span style="opacity:.7">(${d.names[i]})</span><span class="pct">${(lastCounts[i] * 100).toFixed(0)}% van de regio</span></div>`).join('')
+    + `<div class="row" style="margin-top:8px"><span class="hubIcon" style="width:22px;height:22px">🚆</span>Station met rechtstreekse verbinding naar Gent</div>
+       <div class="row"><span class="sw" style="background:none;border:2px dashed #35506a"></span>Gemeentegrens regio</div>`;
+}
+function renderList() {
+  const q = $('q').value.trim().toLowerCase();
+  const items = stations.filter(s => s.train > 0 && insideRegion(s) && s.name.toLowerCase().includes(q))
+    .sort((a, b) => a.train - b.train);
+  $('stations').innerHTML = items.map((s, i) => `<li data-i="${stations.indexOf(s)}"><span>${s.hub ? '🚆 ' : ''}${s.name}</span><b>${s.known ? '±' : '~'} ${s.train} min</b></li>`).join('')
+    || '<li>Geen stations gevonden</li>';
+}
+
+function drawLayers() {
+  L.geoJSON(regionGeo, { style:{ color:'#35506a', weight:1.6, dashArray:'6 5', fill:false }, interactive:false }).addTo(map);
+  railLayer = L.layerGroup(rail.map(g => L.polyline(g, { color:'#2b3f55', weight:1.6, opacity:.85, interactive:false }))).addTo(map);
+  stLayer = L.layerGroup(stations.map(s => {
+    const m = s.hub
+      ? L.marker([s.lat, s.lon], { icon:L.divIcon({ className:'', html:'<div class="hubIcon" style="width:24px;height:24px">🚆</div>', iconSize:[24, 24] }) })
+          .bindTooltip(s.name, { permanent:map.getZoom() >= 0, direction:'right', className:'lbl', offset:[10, 0] })
+      : L.circleMarker([s.lat, s.lon], { radius:4, color:'#243b53', weight:1.5, fillColor:'#fff', fillOpacity:1 }).bindTooltip(s.name, { className:'lbl' });
+    s.marker = m; m.bindPopup(() => popup(s)); return m;
+  })).addTo(map);
+  map.fitBounds(bounds);
+}
+const popup = s => `<b>${s.name}</b><br>${s.hub ? 'Rechtstreekse verbinding naar Gent<br>' : 'Overstap naar Gent nodig (mogelijk)<br>'}Treintijd naar Gent: ${s.known ? '±' : '~'} ${s.train} min`;
+
+map.on('mousemove', e => {
+  if (!mask) return;
+  const cs = candidates(); let best = null, bd = Infinity, bv = Infinity;
+  for (const s of cs) { const d = km({ lat:e.latlng.lat, lon:e.latlng.lng }, s), v = value(s, d); if (v < bv) { bv = v; bd = d; best = s; } }
+  const h = $('hover');
+  h.style.display = 'block';
+  h.innerHTML = `Dichtste station: <b>${best.name}</b> (${bd.toFixed(1)} km)<br>Treintijd ± ${best.train} min · totaal geschat ± ${Math.round(accessMin(bd) + best.train)} min`;
+});
+map.on('mouseout', () => $('hover').style.display = 'none');
+
+// ---------- UI ----------
+function setMode(m) {
+  state.mode = m; $('mDist').classList.toggle('on', m === 'dist'); $('mTime').classList.toggle('on', m === 'time');
+  $('timeOpts').style.display = m === 'time' ? '' : 'none'; if (mask) render();
+}
+$('mDist').onclick = () => setMode('dist'); $('mTime').onclick = () => setMode('time');
+const spdTxt = () => { const v = +$('spd').value; $('spdLbl').textContent = `${v} km/u (${v <= 6 ? 'te voet' : v <= 25 ? 'fiets' : 'auto'})`; };
+$('spd').oninput = () => { state.speed = +$('spd').value; spdTxt(); render(); }; spdTxt();
+$('hubsOnly').onchange = e => { state.hubsOnly = e.target.checked; render(); };
+$('op').oninput = e => overlay && overlay.setOpacity(+e.target.value);
+$('q').oninput = renderList;
+$('showRail').onchange = e => { for (const l of [railLayer, stLayer]) e.target.checked ? map.addLayer(l) : map.removeLayer(l); };
+$('stations').onclick = e => {
+  const li = e.target.closest('li'); if (!li || li.dataset.i === undefined) return;
+  const s = stations[+li.dataset.i]; map.flyTo([s.lat, s.lon], 13); s.marker.openPopup();
+};
+
+let rail = [];
+(async () => {
+  try {
+    setStatus('Gemeentegrenzen (Digitaal Vlaanderen) en OSM-gegevens laden…');
+    const [reg, st] = await Promise.all([loadRegion(), loadStations()]);
+    regionGeo = reg; stations = st; prepStations();
+    setStatus('Spoorlijnen (OSM) laden…');
+    try { rail = await loadRail(); } catch (e) { console.warn(e); }
+    setupRaster(); drawLayers(); render();
+    setStatus('');
+  } catch (e) {
+    console.error(e); setStatus('Laden mislukt: ' + e.message + '. Probeer later opnieuw (Overpass kan druk zijn).', true);
+  }
+})();
+</script>
+</body>
+</html>
