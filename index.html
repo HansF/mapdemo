@@ -406,7 +406,8 @@ spdL();
     buildMask();buildHexes();markServing();draw();compute();list();
     $('src').innerHTML='Reistijden: dienstregeling NMBS via <a href="https://docs.irail.be/" target="_blank" rel="noopener">iRail</a>'
       +(meta.built?` (${meta.built.slice(0,10)})`:'')
-      +'. Gemeentegrenzen: Digitaal Vlaanderen (VRBG) &amp; OpenStreetMap. "Reistijd tot Gent" = toegang tot het station + treinrit.';
+      +'. Gemeentegrenzen: Digitaal Vlaanderen (VRBG) &amp; OpenStreetMap. "Reistijd tot Gent" = toegang tot het station + treinrit. '
+      +'<a href="about.html">Hoe is deze kaart gemaakt? &rarr;</a>';
     map.fitBounds(bounds,{padding:[30,30],animate:false});
     setStatus('');
   }catch(e){
