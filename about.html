@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Colofon — Bereikbaarheid Gent met de trein</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --navy:#114b86; --navy-d:#0d3c6e; --ink:#17364f; --paper:rgba(255,255,255,.93);
+  --edge:rgba(23,54,79,.22); --shadow:0 10px 30px rgba(10,35,60,.18);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);line-height:1.62;
+  background:
+    radial-gradient(900px 620px at 88% -8%,rgba(47,158,79,.16),transparent 62%),
+    radial-gradient(760px 520px at 4% 4%,rgba(17,75,134,.14),transparent 60%),
+    #e8ebe3;
+  background-attachment:fixed}
+
+.card{background:var(--paper);border:1px solid var(--edge);border-radius:16px;box-shadow:var(--shadow)}
+.wrap{max-width:960px;margin:0 auto;padding:26px 22px 90px}
+
+/* ---------- kop ---------- */
+header#title{display:flex;gap:16px;align-items:center;color:#fff;border-radius:18px;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-d) 100%);
+  padding:20px 28px 20px 20px;box-shadow:0 16px 38px rgba(8,30,55,.34);
+  animation:drop .7s cubic-bezier(.2,.9,.3,1) both}
+header#title>svg{flex:none;width:48px;height:48px;padding-right:18px;border-right:1px solid rgba(255,255,255,.28)}
+header#title h1{margin:0;font-size:clamp(21px,3vw,32px);font-weight:800;letter-spacing:-.025em;line-height:1.08}
+header#title h2{margin:3px 0 0;font-size:clamp(13px,1.6vw,18px);font-weight:600;opacity:.95}
+@keyframes drop{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+nav.bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 22px}
+nav.bar a{text-decoration:none;font-size:12.5px;font-weight:600;color:var(--navy);
+  background:rgba(255,255,255,.8);border:1px solid var(--edge);border-radius:999px;padding:6px 14px;
+  transition:background .15s,transform .15s}
+nav.bar a:hover{background:#fff;transform:translateY(-1px)}
+nav.bar a.primary{background:var(--navy);color:#fff;border-color:var(--navy)}
+nav.bar a.primary:hover{background:var(--navy-d)}
+
+section{padding:24px 28px;margin:16px 0;animation:rise .6s cubic-bezier(.2,.9,.3,1) both}
+section>h3{margin:0 0 4px;font-size:19px;font-weight:800;color:var(--navy);letter-spacing:-.015em}
+section>h3 .num{font-family:"JetBrains Mono",monospace;font-size:13px;opacity:.45;margin-right:9px}
+section>.lead{margin:0 0 16px;font-size:13px;opacity:.68}
+h4{margin:20px 0 6px;font-size:14px;font-weight:700}
+p{margin:9px 0}
+ul{margin:9px 0;padding-left:20px}
+li{margin:5px 0}
+a{color:var(--navy)}
+code,kbd{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:.88em;
+  background:rgba(17,75,134,.1);border-radius:5px;padding:1.5px 5px}
+pre{background:#102a41;color:#dce8f4;border-radius:12px;padding:15px 17px;overflow:auto;
+  font-family:"JetBrains Mono",ui-monospace,monospace;font-size:12px;line-height:1.6;margin:12px 0}
+pre code{background:none;padding:0;color:inherit}
+.small{font-size:12.5px;opacity:.72}
+
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--navy);opacity:.85}
+tbody tr:nth-child(odd){background:rgba(17,75,134,.045)}
+
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin:14px 0}
+.tile{border:1px solid var(--edge);border-radius:12px;padding:13px 15px;background:rgba(255,255,255,.62)}
+.tile b{display:block;font-size:13px;color:var(--navy);margin-bottom:3px}
+.tile span{font-size:12.5px;opacity:.78}
+
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:9px;margin:16px 0}
+.step{flex:1 1 150px;border:1px solid var(--edge);border-left:4px solid var(--navy);border-radius:10px;
+  padding:11px 13px;background:rgba(255,255,255,.66)}
+.step b{display:block;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:var(--navy);margin-bottom:3px}
+.step span{font-size:12.5px;opacity:.8}
+.arrow{align-self:center;color:var(--navy);opacity:.42;font-size:19px}
+
+.callout{border-left:4px solid #f79a35;background:rgba(247,154,53,.1);border-radius:0 10px 10px 0;
+  padding:12px 16px;margin:14px 0;font-size:13px}
+.callout.win{border-left-color:#2f9e4f;background:rgba(47,158,79,.11)}
+.callout b{display:block;margin-bottom:2px}
+
+.ramp{display:flex;height:17px;border-radius:5px;overflow:hidden;border:1px solid rgba(0,0,0,.2);
+  margin:10px 0 4px;max-width:420px}
+.ramp i{flex:1}
+.ramp+.small{max-width:420px;display:flex;justify-content:space-between}
+
+footer{text-align:center;margin-top:32px;font-size:12px;opacity:.6}
+.sig{font-family:Caveat,cursive;font-size:30px;color:var(--navy);opacity:.85;
+  text-align:center;margin:26px 0 4px;line-height:1.1}
+@media(max-width:640px){.wrap{padding:16px 13px 60px}section{padding:18px 17px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header id="title">
+  <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C7.6 2 4 2.5 4 6v9.5A3.5 3.5 0 0 0 7.5 19L6 20.5v.5h2.2l2-2h3.6l2 2H18v-.5L16.5 19a3.5 3.5 0 0 0 3.5-3.5V6c0-3.5-3.6-4-8-4zM7.5 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3.5-6H6V6.5h5V10zm2 0V6.5h5V10h-5zm3.5 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+  <div>
+    <h1>Colofon &amp; methodiek</h1>
+    <h2>Hoe deze bereikbaarheidskaart gebouwd is — voor GIS-collega's</h2>
+  </div>
+</header>
+
+<nav class="bar">
+  <a class="primary" href="index.html">&larr; Naar de kaart</a>
+  <a href="#waarom">Waarom</a>
+  <a href="#bronnen">Bronnen</a>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#geometrie">Geometrie</a>
+  <a href="#hex">Hexgrid</a>
+  <a href="#model">Model</a>
+  <a href="#render">Rendering</a>
+  <a href="#valkuilen">Valkuilen</a>
+  <a href="#repro">Zelf draaien</a>
+</nav>
+
+<section class="card" id="waarom">
+  <h3><span class="num">01</span>Waarom deze kaart bestaat</h3>
+  <p class="lead">Van een mooi plaatje naar een reproduceerbaar GIS-product.</p>
+  <p>Het vertrekpunt was een gedrukte posterkaart: “Bereikbaarheid Gent met de trein — Vlaamse Ardennen en
+  ruime omgeving”. Mooi, maar statisch, zonder bronvermelding en zonder manier om de cijfers na te rekenen.
+  De vraag was simpel: <b>kunnen we dat beeld opnieuw opbouwen, volledig uit open data, volledig
+  reproduceerbaar, en interactief in de browser?</b></p>
+  <p>Het antwoord staat hiernaast. Alles wat je op de kaart ziet — de regiogrens, de spoorlijnen, de
+  stations, de reistijden en de kleurklassen — komt uit een script dat je zelf opnieuw kan draaien. Geen
+  handmatig ingetekende polygonen, geen overgetypte reistijden.</p>
+  <div class="callout win">
+    <b>Kernidee</b>
+    De kaart toont niet “afstand tot het spoor”, maar <i>deur-tot-deur reistijd naar Gent-Sint-Pieters</i>:
+    de tijd om je dichtstbijzijnde station te bereiken, plus de echte treinreis vanaf dat station.
+  </div>
+</section>
+
+<section class="card" id="bronnen">
+  <h3><span class="num">02</span>Databronnen</h3>
+  <p class="lead">Drie open bronnen, elk met hun eigen eigenaardigheden.</p>
+  <table>
+    <thead><tr><th>Bron</th><th>Wat we eruit halen</th><th>Toegang</th><th>Licentie</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>VRBG</b><br><span class="small">Voorlopig Referentiebestand Gemeentegrenzen, Digitaal Vlaanderen</span></td>
+        <td>Gemeentegrenzen van de 16 Vlaamse gemeenten in de regio</td>
+        <td><code>WFS 2.0</code> op <code>geo.api.vlaanderen.be/VRBG/wfs</code>, <code>GetFeature</code> met <code>CQL_FILTER</code> op <code>NAAM</code>, uitvoer GeoJSON in EPSG:4326</td>
+        <td>Gratis Open Data Licentie Vlaanderen v1.2</td>
+      </tr>
+      <tr>
+        <td><b>OpenStreetMap</b><br><span class="small">via Overpass API</span></td>
+        <td>De 6 Waalse gemeentegrenzen (<code>admin_level=8</code>) én alle spoorlijnen (<code>railway=rail</code>) in de bbox</td>
+        <td><code>POST</code> naar <code>/api/interpreter</code> met Overpass QL, <code>out geom</code></td>
+        <td>ODbL 1.0 — © OpenStreetMap-bijdragers</td>
+      </tr>
+      <tr>
+        <td><b>iRail</b><br><span class="small">open NMBS/SNCB-API</span></td>
+        <td>Alle 715 Belgische stations met coördinaten, plus echte reistijden en overstapaantallen naar Gent-Sint-Pieters</td>
+        <td><code>api.irail.be/stations/</code> en <code>/connections/</code>, JSON</td>
+        <td>Open, mits <code>User-Agent</code> en respect voor rate limits</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <b>De Datavindplaats-omweg</b>
+    De opdracht verwees naar de Vlaamse Datavindplaats-catalogus. Die blijkt een Nuxt-SPA zonder publiek
+    dataset-endpoint, en de zoekterm <i>mobiliteit</i> gaf daar nul resultaten. We zijn daarom één laag dieper
+    gegaan en spreken de onderliggende <b>Digitaal Vlaanderen WFS-services rechtstreeks</b> aan. Les voor de
+    GIS-praktijk: een catalogus is een vindmiddel, geen API — zoek altijd de service achter het record.
+  </div>
+</section>
+
+<section class="card" id="pipeline">
+  <h3><span class="num">03</span>Architectuur: prefetch in plaats van live calls</h3>
+  <p class="lead">Het belangrijkste ontwerpbesluit van het hele project.</p>
+  <p>De eerste versie haalde VRBG, Overpass en iRail <i>live in de browser</i> op. Dat werkte, maar slecht:
+  Overpass gaf geregeld <code>504 Gateway Timeout</code>, iRail vraagt honderden losse calls, en de kaart stond
+  twintig tot zestig seconden op “laden”. Onbruikbaar voor een demo.</p>
+  <p>Daarom is alles verschoven naar een <b>build-stap vooraf</b>. Een Python-script bevraagt de bronnen
+  één keer, normaliseert alles en schrijft compacte JSON naar <code>data/</code>. De webpagina doet vervolgens
+  niets anders dan vijf statische bestanden ophalen — dat is binnen een seconde klaar en werkt op GitHub
+  Pages zonder server, zonder API-sleutel en zonder CORS-gedoe.</p>
+
+  <div class="flow">
+    <div class="step"><b>1 · Fetch</b><span>WFS, Overpass en iRail bevragen, met retries en mirrors</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><b>2 · Normaliseer</b><span>Namen matchen, relaties stitchen, geometrie vereenvoudigen</span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><b>3 · Schrijf</b><span>GeoJSON + JSON naar <code>data/</code>, incl. <code>meta.json</code></span></div>
+    <div class="arrow">&rarr;</div>
+    <div class="step"><b>4 · Render</b><span>Eén <code>index.html</code> met Leaflet, alle logica client-side</span></div>
+  </div>
+
+  <h4>De uitvoer</h4>
+  <div class="grid">
+    <div class="tile"><b>region.geojson</b><span>22 gemeenten, ±4 755 punten, ±90 kB</span></div>
+    <div class="tile"><b>outline.geojson</b><span>De gedissolveerde buitengrens als één polygoon</span></div>
+    <div class="tile"><b>stations.json</b><span>144 stations met coördinaten, reistijd en overstappen</span></div>
+    <div class="tile"><b>rail.json</b><span>±3 149 spoorsegmenten als lijnreeksen</span></div>
+    <div class="tile"><b>meta.json</b><span>Build-timestamp en bronvermelding</span></div>
+  </div>
+  <p class="small">Totaal onder de 350 kB. Dat is bewust: de hele payload past ruim binnen wat een
+  gemiddelde webpagina toch al laadt, en hij is volledig cachebaar.</p>
+</section>
+
+<section class="card" id="geometrie">
+  <h3><span class="num">04</span>Geometrieverwerking</h3>
+  <p class="lead">Grenzen samenvoegen en vereenvoudigen, zonder ze te slopen.</p>
+
+  <h4>Grensoverschrijdend samenvoegen</h4>
+  <p>De regio ligt over de taalgrens. Vlaamse grenzen komen uit VRBG, Waalse uit OSM. OSM levert
+  <code>admin_level=8</code>-relaties als losse members; die worden geprogrammeerd aan elkaar geregen tot
+  gesloten ringen (het klassieke <i>relation-to-polygon</i>-probleem: members hebben willekeurige richting en
+  volgorde).</p>
+  <p>Omdat beide bronnen een andere digitalisatie van dezelfde taalgrens gebruiken, blijven er bij een
+  naïeve union haarscheurtjes over. Oplossing met Shapely: <code>unary_union</code>, gevolgd door een
+  <code>buffer(+1e-5)</code> en <code>buffer(-1e-5)</code>. Die micro-dilatatie/erosie dicht de naden zonder de
+  buitengrens merkbaar te verplaatsen.</p>
+
+  <h4>Vereenvoudiging — en een bug die het waard is te kennen</h4>
+  <p>Ruwe VRBG-grenzen leverden bijna 1 MB GeoJSON. Met Douglas-Peucker (<code>TOL ≈ 0,00025°</code>, zo'n
+  25 m) gaat dat naar 90 kB zonder zichtbaar verlies op demoschaal.</p>
+  <div class="callout">
+    <b>Douglas-Peucker en gesloten ringen</b>
+    Bij een gesloten ring is het eerste punt gelijk aan het laatste. De basislijn tussen begin- en eindpunt
+    heeft dus lengte nul, elke loodrechte afstand wordt 0, en het algoritme reduceert je hele gemeente tot
+    <b>één punt</b>. Precies dat gebeurde hier: de kaart was in eerste instantie leeg.
+    <br><br>De fix: laat het sluitende duplicaatpunt vallen, zoek het punt dat het verst van het startpunt
+    ligt, splits de ring in twee halve ringen en vereenvoudig die apart. Als je ooit zelf DP implementeert
+    op polygonen in plaats van op lijnen: dit is de valkuil.
+  </div>
+</section>
+
+<section class="card" id="hex">
+  <h3><span class="num">05</span>Het hexagonale raster</h3>
+  <p class="lead">Waarom hexagonen, en hoe ze in de regio terechtkomen.</p>
+  <p>Hexagonen hebben één afstand tot elke buur, geen diagonaalbias, en ze geven een egale visuele textuur
+  zonder de ladderpatronen van een vierkantsraster. We gebruiken een <i>pointy-top</i>-layout: met straal
+  <code>R</code> is de horizontale steek <code>√3·R</code> en de verticale <code>1,5·R</code>, met oneven rijen
+  een halve steek verschoven.</p>
+
+  <h4>Point-in-polygon via een maskerraster</h4>
+  <p>Voor elk kandidaat-middelpunt moet je weten of het binnen de regio valt. Klassieke ray-casting over
+  4 755 randpunten × duizenden cellen is traag in JavaScript. In plaats daarvan rasteriseren we de regio
+  één keer: de polygonen worden in Web-Mercator (EPSG:3857) op een offscreen <code>&lt;canvas&gt;</code> van
+  1100 px breed getekend met vulregel <code>evenodd</code> — die regel handelt enclaves en gaten gratis
+  correct af. Daarna is de test gewoon <q>is alpha &gt; 128 op deze pixel</q>: O(1), en exact hetzelfde
+  masker wordt hergebruikt voor de hover-probe.</p>
+  <p>Resultaat: ongeveer <b>4 400 hexagonen</b> binnen de regio, opgebouwd in een fractie van een seconde.</p>
+  <p class="small">Bewust géén H3 of andere DGGS: de afhankelijkheid is het hier niet waard, en voor een
+  regio van deze omvang is de vervorming van Web-Mercator verwaarloosbaar. Voor een productkaart over heel
+  Vlaanderen zou je wél naar H3 of Lambert 72 grijpen.</p>
+</section>
+
+<section class="card" id="model">
+  <h3><span class="num">06</span>Het bereikbaarheidsmodel</h3>
+  <p class="lead">Twee modi, één formule, expliciete aannames.</p>
+  <p>Per hexagon zoeken we het station dat de laagste totaalwaarde oplevert — niet per se het
+  dichtstbijzijnde station. Een halte op 6 km met een rechtstreekse trein verslaat vaak een halte op 2 km
+  met twee overstappen.</p>
+  <pre><code>toegangstijd(km) = km × 1,32 × 60 / snelheid_kmh
+totale_reistijd   = toegangstijd(afstand_tot_station) + treintijd_naar_Gent
+waarde_hexagon    = min over alle stations</code></pre>
+  <ul>
+    <li><b>Modus “Afstand tot station”</b> — zuiver hemelsbrede afstand tot de dichtstbijzijnde halte,
+      klassen op 2 / 4 / 6 / 8 / 10 km.</li>
+    <li><b>Modus “Reistijd tot Gent”</b> — de formule hierboven, klassen op 30 / 45 / 60 / 75 / 90 minuten.</li>
+    <li><b>Omwegfactor 1,32</b> — hemelsbrede afstand onderschat de werkelijke wegafstand. 1,32 is een
+      gangbare benadering voor Vlaamse wegennetten. Wil je het exact? Dan heb je een echte
+      routeringsmatrix nodig (OSRM, Valhalla, pgRouting); dat is de voor de hand liggende volgende stap.</li>
+    <li><b>Instelbare snelheid</b> — de schuifregelaar gaat van 4 km/u (te voet) over ±16 km/u (fiets) tot
+      50 km/u (auto). Het hele raster herberekent live; dat maakt zichtbaar hoe sterk “bereikbaarheid”
+      afhangt van je veronderstelde vervoerswijze.</li>
+  </ul>
+  <div class="ramp">
+    <i style="background:#2f9e4f"></i><i style="background:#8ed24a"></i><i style="background:#f7e03d"></i>
+    <i style="background:#f79a35"></i><i style="background:#e8402e"></i><i style="background:#8f1b2e"></i>
+  </div>
+  <div class="small"><span>zeer goed</span><span>zeer slecht</span></div>
+  <p class="small">Zes klassen met vaste, ronde grenzen in plaats van kwantielen: ronde getallen zijn
+  leesbaar voor een algemeen publiek, en de legende blijft vergelijkbaar tussen de twee modi en tussen
+  snelheidsinstellingen. De legende toont wel live welk <b>percentage van het gebied</b> in elke klasse
+  valt — klik een klasse aan om enkel die band te isoleren.</p>
+</section>
+
+<section class="card" id="render">
+  <h3><span class="num">07</span>Rendering en cartografie</h3>
+  <p class="lead">Leaflet, maar met wat zorg voor de kaartopbouw.</p>
+  <h4>Panes bepalen de leesbaarheid</h4>
+  <p>Leaflet-panes geven expliciete controle over de z-ordening, en dat is hier het verschil tussen een
+  leesbare en een onleesbare kaart:</p>
+  <pre><code>base-pane  200   grijze achtergrondkaart (Esri Light Gray Canvas)
+heat       350   het gekleurde hexagonraster
+rail       400   spoorlijnen uit OSM
+edge       410   gemeentegrenzen dun, regio-omtrek vet gestippeld
+labels     430   plaatsnamen — bewust BOVEN de kleurvlakken
+markers    600   stations</code></pre>
+  <p>Plaatsnamen moeten boven de kleurvulling liggen, anders verdwijnen ze. Dat vereist een basiskaart met
+  een <b>aparte labellaag</b>. We gebruiken Esri Light Gray Canvas (<code>Base</code> + <code>Reference</code>),
+  omdat die geen API-sleutel vraagt — de CARTO-basemaps die we eerst gebruikten doen dat sinds kort wel.
+  Een CSS-filter (<code>saturate(.45) sepia(.12)</code>) trekt de ondergrond naar de warme tint van de
+  originele poster.</p>
+
+  <h4>Het raster als één image overlay</h4>
+  <p>4 400 Leaflet-vectorpolygonen is zwaar. In plaats daarvan tekenen we alle hexagonen op een canvas en
+  hangen we het resultaat als één <code>L.imageOverlay</code> aan de kaart. De berekening (<code>compute</code>)
+  is bovendien gescheiden van het tekenen (<code>paint</code>), zodat het isoleren van een legendeklasse of
+  het wijzigen van de dekking puur hertekenen is — instant, zonder herberekening.</p>
+
+  <h4>Labels ontwarren</h4>
+  <p>144 stations allemaal labelen geeft brij. Daarom krijgt een station pas een naamlabel als het
+  <i>voor minstens één hexagon het gekozen station is</i> én een rechtstreekse verbinding heeft. De rest
+  blijft een stip met tooltip. Dat reduceert vanzelf tot zo'n vijftien labels — ongeveer wat de originele
+  poster toont, maar nu afgeleid uit de data in plaats van met de hand gekozen.</p>
+</section>
+
+<section class="card" id="valkuilen">
+  <h3><span class="num">08</span>Valkuilen uit de praktijk</h3>
+  <p class="lead">Het eerlijke deel: wat er misging en wat het ons leerde.</p>
+  <ul>
+    <li><b>WFS <code>propertyName</code> sloopt je geometrie.</b> <code>propertyName=NAAM</code> meegeven aan
+      de VRBG-service levert keurige attributen op én <code>geometry: null</code>. Vraag gewoon alle velden op.</li>
+    <li><b>Overpass-mirrors zijn wisselvallig.</b> <code>overpass-api.de</code> en
+      <code>overpass.kumi.systems</code> geven geregeld 504. En <code>overpass.osm.ch</code> dekt enkel
+      Zwitserland: die geeft stilletjes <code>elements: []</code> terug, dus <b>een leeg resultaat moet je als
+      fout behandelen</b>, niet als “geen data”. Bouw retries over meerdere mirrors.</li>
+    <li><b>Gemeenten fuseren.</b> Galmaarden bestaat niet meer in de huidige VRBG; het ging op in Pajottegem.
+      Een hardgecodeerde namenlijst heeft dus een houdbaarheidsdatum — zeker rond fusiejaren.</li>
+    <li><b>Namen matchen tussen bronnen is nooit exact.</b> OSM, iRail en NMBS schrijven stationsnamen
+      verschillend (koppeltekens, accenten, “-Sint-” tegenover “-St-”). Er zit een normalisatiefunctie in
+      het script; 144 van de 146 stations matchen, twee vallen af door API-fouten aan de bronkant.</li>
+    <li><b>“Eerstvolgende verbinding” is niet “typische verbinding”.</b> iRail geeft met
+      <code>results=N</code> de volgende N vertrekken — die kunnen toevallig allemaal trage stoptreinen zijn.
+      Resultaat: Geraardsbergen kwam als 73 minuten binnen op een lijn met een rechtstreekse trein. De
+      oplossing is bemonsteren over de dag (07:00 / 08:30 / 12:00 / 17:00), de snelste rechtstreekse
+      verbinding bevoorrechten en de mediaan als typische waarde nemen.</li>
+    <li><b>Een fix na de import telt niet.</b> Twee langlopende buildjobs hadden de module al geïmporteerd
+      vóór de Douglas-Peucker-fix opgeslagen was, en schreven vrolijk kapotte output weg. Herstart je
+      pipeline na elke wijziging.</li>
+  </ul>
+  <div class="callout">
+    <b>Data is eerlijker dan de poster</b>
+    De originele kaart zet Oudenaarde op 17 minuten van Gent. iRail geeft consequent 29 à 31 minuten. Wij
+    tonen het echte cijfer. Dat maakt de kaart minder flatteus, maar het is wél controleerbaar — en dat is
+    precies het verschil tussen een illustratie en een GIS-product.
+  </div>
+</section>
+
+<section class="card" id="repro">
+  <h3><span class="num">09</span>Zelf draaien</h3>
+  <p class="lead">Twee commando's, geen build-tooling, geen sleutels.</p>
+  <pre><code># data opnieuw ophalen (duurt enkele minuten door iRail-rate limits)
+python build_data.py
+
+# lokaal bekijken
+python -m http.server 8000
+# open http://localhost:8000/index.html</code></pre>
+  <p>Enige afhankelijkheid is <code>shapely</code>, voor het dissolven van de regio-omtrek. De webpagina zelf
+  heeft geen build-stap: Leaflet komt van een CDN, de rest is één HTML-bestand. Hosting is daarom gewoon
+  GitHub Pages met een <code>.nojekyll</code>-bestand.</p>
+  <h4>Aanpassen aan je eigen regio</h4>
+  <ul>
+    <li><code>FLEMISH</code> en <code>WALLOON</code> in <code>build_data.py</code> — de gemeentenamen.</li>
+    <li><code>BBOX</code> — het zoekvenster voor Overpass.</li>
+    <li><code>GENT_ID</code> — het iRail-station waar alles naartoe gerekend wordt. Vervang dit door eender
+      welk Belgisch station en je hebt een nieuwe bereikbaarheidskaart.</li>
+    <li><code>MODES</code> in <code>index.html</code> — de klassengrenzen en eenheden.</li>
+  </ul>
+  <h4>Logische vervolgstappen</h4>
+  <ul>
+    <li>Echte netwerkafstand via OSRM of pgRouting in plaats van de omwegfactor 1,32.</li>
+    <li>Bevolkingscijfers eroverheen, zodat je “% inwoners binnen 45 minuten van Gent” kan rapporteren.</li>
+    <li>De bus- en tramdata van De Lijn mee opnemen als toegangsmodus naar het station.</li>
+    <li>Isochronen op basis van de dienstregeling (GTFS) in plaats van een symmetrisch snelheidsmodel.</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h3><span class="num">10</span>Bronvermelding</h3>
+  <ul>
+    <li>Gemeentegrenzen Vlaanderen: <b>VRBG</b>, Digitaal Vlaanderen — Gratis Open Data Licentie Vlaanderen v1.2</li>
+    <li>Gemeentegrenzen Wallonië en spoorinfrastructuur: <b>© OpenStreetMap-bijdragers</b>, ODbL — via de Overpass API</li>
+    <li>Stations en reistijden: <b>iRail</b> (<a href="https://docs.irail.be/" target="_blank" rel="noopener">docs.irail.be</a>), op basis van NMBS/SNCB-gegevens</li>
+    <li>Achtergrondkaart: <b>Esri Light Gray Canvas</b> — Esri, HERE, Garmin, © OpenStreetMap-bijdragers</li>
+    <li>Kaartbibliotheek: <b>Leaflet</b> 1.9.4</li>
+  </ul>
+  <p class="small">Gemaakt als demo om te tonen dat een overtuigende, gepubliceerde bereikbaarheidskaart
+  neerkomt op open data, een paar honderd regels Python en één HTML-bestand.</p>
+</section>
+
+<div class="sig">Dichter bij de natuur,<br>vlot naar Gent.</div>
+<footer>
+  <a href="index.html">&larr; Terug naar de interactieve kaart</a>
+</footer>
+
+</div>
+</body>
+</html>

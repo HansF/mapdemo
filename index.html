@@ -1,337 +1,417 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bereikbaarheid Gent met de trein – Vlaamse Ardennen</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<title>Bereikbaarheid Gent met de trein — Vlaamse Ardennen</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
 <style>
-  :root { --blue:#0a4c94; --ink:#12395f; --line:rgba(60,100,140,.4); }
-  * { box-sizing:border-box; }
-  html,body { margin:0; height:100%; font-family:"Segoe UI",Tahoma,sans-serif; color:var(--ink); }
-  #map { position:absolute; inset:0; background:#e8e6dd; }
-  .leaflet-tile-pane { filter:saturate(.55) brightness(1.06); }
-  .card { background:rgba(255,255,255,.93); border:1px solid var(--line); border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,.14); }
-  #title { position:absolute; z-index:1000; left:14px; top:14px; background:var(--blue); color:#fff; border-radius:12px;
-           padding:10px 18px 10px 14px; display:flex; gap:14px; align-items:center; max-width:calc(100% - 420px); box-shadow:0 6px 18px rgba(0,0,0,.25); }
-  #title .ico { font-size:34px; line-height:1; padding-right:14px; border-right:1px solid rgba(255,255,255,.4); }
-  #title h1 { margin:0; font-size:clamp(17px,2.2vw,30px); letter-spacing:-.02em; }
-  #title h2 { margin:0; font-size:clamp(13px,1.5vw,20px); font-weight:600; }
-  #title p { margin:4px 0 0; font-size:12px; opacity:.92; }
-  #panel { position:absolute; z-index:1000; right:14px; top:14px; bottom:14px; width:340px; display:flex; flex-direction:column; gap:10px; pointer-events:none; }
-  #panel > * { pointer-events:auto; }
-  .card { padding:12px 14px; }
-  .card h3 { margin:0 0 8px; font-size:15px; color:var(--blue); }
-  .row { display:flex; align-items:center; gap:8px; font-size:13px; margin:4px 0; }
-  .sw { width:26px; height:16px; border-radius:3px; border:1px solid rgba(0,0,0,.25); flex:none; }
-  .row .pct { margin-left:auto; font-variant-numeric:tabular-nums; opacity:.75; font-size:12px; }
-  .seg { display:flex; border:1px solid var(--blue); border-radius:8px; overflow:hidden; margin-bottom:8px; }
-  .seg button { flex:1; border:0; background:#fff; color:var(--blue); padding:6px 4px; font:inherit; font-size:13px; cursor:pointer; }
-  .seg button.on { background:var(--blue); color:#fff; }
-  label.opt { display:flex; gap:8px; align-items:center; font-size:13px; margin:6px 0; }
-  input[type=range] { width:100%; }
-  #list { flex:1; min-height:120px; display:flex; flex-direction:column; }
-  #q { width:100%; padding:6px 8px; border:1px solid var(--line); border-radius:8px; font:inherit; font-size:13px; margin-bottom:6px; }
-  #stations { overflow:auto; flex:1; margin:0; padding:0; list-style:none; }
-  #stations li { display:flex; justify-content:space-between; gap:8px; padding:5px 4px; font-size:13px; border-bottom:1px solid rgba(0,0,0,.06); cursor:pointer; }
-  #stations li:nth-child(odd) { background:rgba(20,100,180,.05); }
-  #stations li:hover { background:rgba(20,100,180,.16); }
-  #stations b { white-space:nowrap; }
-  .note { font-size:11px; opacity:.7; margin-top:6px; line-height:1.35; }
-  #status { position:absolute; z-index:1000; left:14px; bottom:34px; padding:8px 12px; font-size:13px; max-width:420px; }
-  #hover { position:absolute; z-index:1000; left:14px; bottom:84px; padding:8px 12px; font-size:13px; display:none; }
-  .err { color:#b00020; }
-  .hubIcon { background:var(--blue); color:#fff; border:2px solid #fff; border-radius:7px; text-align:center; font-size:13px; line-height:22px; box-shadow:0 1px 4px rgba(0,0,0,.45); }
-  .lbl { background:rgba(255,255,255,.85); border:0; box-shadow:none; font-weight:700; font-size:12px; padding:0 4px; color:#10283f; }
-  .lbl::before { display:none; }
-  @media (max-width:900px) {
-    #panel { width:auto; left:14px; top:auto; height:46%; }
-    #title { max-width:calc(100% - 28px); } #status,#hover { bottom:48%; }
-  }
+:root{
+  --navy:#114b86; --navy-d:#0d3c6e; --ink:#17364f; --paper:rgba(255,255,255,.93);
+  --edge:rgba(23,54,79,.22); --shadow:0 10px 30px rgba(10,35,60,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);background:#dfe3da;overflow:hidden}
+#map{position:absolute;inset:0;background:#e9e7de}
+.leaflet-container{font-family:inherit}
+.leaflet-pane.base-pane img{filter:saturate(.45) contrast(.95) brightness(1.04) sepia(.12)}
+
+.card{background:var(--paper);border:1px solid var(--edge);border-radius:14px;box-shadow:var(--shadow);backdrop-filter:blur(6px)}
+.card h3{margin:0 0 10px;font-size:15px;font-weight:800;color:var(--navy);letter-spacing:-.01em}
+
+#title{position:absolute;z-index:900;left:18px;top:18px;display:flex;gap:16px;align-items:center;
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-d) 100%);color:#fff;border-radius:16px;
+  padding:14px 26px 14px 18px;box-shadow:0 14px 34px rgba(8,30,55,.38);max-width:min(620px,46vw);
+  animation:drop .7s cubic-bezier(.2,.9,.3,1) both}
+#title>svg{flex:none;width:46px;height:46px;padding-right:16px;border-right:1px solid rgba(255,255,255,.28)}
+#title h1{margin:0;font-size:clamp(19px,2.1vw,31px);font-weight:800;letter-spacing:-.025em;line-height:1.08}
+#title h2{margin:2px 0 0;font-size:clamp(14px,1.45vw,21px);font-weight:600;opacity:.95;line-height:1.15}
+#title p{margin:7px 0 0;font-size:11.5px;line-height:1.45;opacity:.82;max-width:46ch}
+
+#right{position:absolute;z-index:900;right:18px;top:18px;bottom:52px;width:332px;
+  display:flex;flex-direction:column;gap:12px;pointer-events:none}
+#right>*{pointer-events:auto;animation:slide .7s .12s cubic-bezier(.2,.9,.3,1) both}
+#right>*:nth-child(2){animation-delay:.2s}#right>*:nth-child(3){animation-delay:.28s}
+
+#legend{padding:14px 16px}
+.band{display:flex;align-items:center;gap:9px;font-size:12.5px;padding:3px 5px;margin:0 -5px;border-radius:7px;cursor:pointer;transition:background .15s}
+.band:hover{background:rgba(17,75,134,.09)}
+.band.off{opacity:.33}
+.sw{width:30px;height:15px;border-radius:3px;border:1px solid rgba(0,0,0,.22);flex:none}
+.band .q{opacity:.62}
+.band .pct{margin-left:auto;font-variant-numeric:tabular-nums;font-size:11px;opacity:.6;font-weight:600}
+.sep{height:1px;background:var(--edge);margin:11px 0 9px}
+.sym{display:flex;align-items:center;gap:9px;font-size:12px;margin:5px 0;line-height:1.25}
+.sym i{flex:none;width:30px;display:flex;justify-content:center}
+
+#times{padding:14px 16px 12px;flex:1;display:flex;flex-direction:column;min-height:150px}
+#q{width:100%;margin:2px 0 8px;padding:7px 10px;border:1px solid var(--edge);border-radius:9px;font:inherit;font-size:12.5px;background:rgba(255,255,255,.75)}
+#q:focus{outline:2px solid rgba(17,75,134,.35);outline-offset:-1px}
+#list{flex:1;overflow:auto;margin:0;padding:0;list-style:none;scrollbar-width:thin}
+#list li{display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12.5px;border-radius:7px;cursor:pointer;transition:background .12s,transform .12s}
+#list li:nth-child(odd){background:rgba(17,75,134,.065)}
+#list li:hover{background:rgba(17,75,134,.18);transform:translateX(2px)}
+#list li .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#list li b{font-variant-numeric:tabular-nums;font-weight:700}
+#list li .dot{width:7px;height:7px;border-radius:50%;flex:none;background:#9fb3c4}
+#list li .dot.direct{background:var(--navy);box-shadow:0 0 0 2.5px rgba(17,75,134,.22)}
+.note{font-size:10.5px;line-height:1.5;opacity:.68;margin-top:9px}
+.note a{color:var(--navy)}
+
+#ctl{padding:12px 16px 14px}
+.seg{display:flex;border:1.5px solid var(--navy);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.seg button{flex:1;border:0;background:transparent;color:var(--navy);padding:7px 4px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s,color .18s}
+.seg button.on{background:var(--navy);color:#fff}
+.opt{display:flex;align-items:center;gap:9px;font-size:12.5px;margin:8px 0;cursor:pointer}
+.opt input{accent-color:var(--navy);width:15px;height:15px;cursor:pointer}
+.rng{display:flex;align-items:center;gap:10px;font-size:12px;margin:9px 0 2px}
+.rng input{flex:1;accent-color:var(--navy);cursor:pointer;min-width:0}
+.rng b{font-variant-numeric:tabular-nums;white-space:nowrap;font-size:11.5px}
+
+#slogan{position:absolute;z-index:850;left:22px;bottom:118px;font-family:Caveat,cursive;font-size:38px;
+  line-height:.95;color:var(--navy-d);text-shadow:0 2px 10px rgba(255,255,255,.95);pointer-events:none;
+  animation:fade 1s .7s both}
+#slogan::after{content:"";display:block;width:132px;height:9px;margin-top:6px;
+  border-bottom:3px solid var(--navy-d);border-radius:0 0 60% 60%/0 0 100% 100%}
+
+#probe{position:absolute;z-index:900;left:22px;bottom:240px;padding:11px 15px;font-size:12.5px;line-height:1.5;
+  max-width:330px;display:none}
+#probe .h{font-weight:800;color:var(--navy);font-size:13px}
+#probe .v{font-variant-numeric:tabular-nums}
+
+#status{position:absolute;z-index:1200;left:50%;top:50%;transform:translate(-50%,-50%);padding:18px 26px;
+  font-size:13.5px;text-align:center;min-width:290px;max-width:440px}
+#status .bar{height:4px;border-radius:3px;background:rgba(17,75,134,.16);margin-top:11px;overflow:hidden}
+#status .bar i{display:block;height:100%;width:30%;background:var(--navy);border-radius:3px;animation:run 1.15s ease-in-out infinite}
+.err{color:#9b1c2e}
+
+.leaflet-control-scale-line{border-color:var(--ink)!important;color:var(--ink);background:rgba(255,255,255,.82);font-weight:700;font-size:11px}
+.leaflet-control-attribution{font-size:10px;background:rgba(255,255,255,.82)!important}
+
+.hub{display:flex;align-items:center}
+.hub .pin{width:27px;height:27px;border-radius:7px;background:var(--navy);border:2px solid #fff;
+  box-shadow:0 2px 7px rgba(8,30,55,.5);display:flex;align-items:center;justify-content:center;flex:none;
+  transition:transform .18s cubic-bezier(.3,1.4,.5,1)}
+.hub:hover .pin{transform:scale(1.22)}
+.hub .pin svg{width:17px;height:17px;fill:#fff}
+.hub .nm{font-weight:800;font-size:12.5px;color:#0e2d47;white-space:nowrap;margin-left:5px;
+  text-shadow:0 0 4px #fff,0 0 4px #fff,0 0 8px #fff,0 1px 2px #fff}
+.halt{display:block;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid #2b4257;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.halt.key{width:11px;height:11px;border-width:2.5px;box-shadow:0 1px 5px rgba(0,0,0,.45)}
+.leaflet-tooltip.plain{background:rgba(255,255,255,.92);border:1px solid var(--edge);box-shadow:var(--shadow);
+  font-weight:700;font-size:11.5px;color:var(--ink);border-radius:7px;padding:3px 7px}
+.leaflet-tooltip.plain::before{display:none}
+.leaflet-popup-content-wrapper{border-radius:12px;box-shadow:var(--shadow)}
+.leaflet-popup-content{margin:12px 14px;font-size:12.5px;line-height:1.55}
+.pop h4{margin:0 0 6px;font-size:14px;color:var(--navy);font-weight:800}
+.pop .big{font-size:23px;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
+.pop .tag{display:inline-block;margin-top:7px;padding:2px 8px;border-radius:20px;font-size:10.5px;font-weight:700;
+  background:rgba(47,158,79,.16);color:#1d6b35}
+.pop .tag.t{background:rgba(247,154,53,.2);color:#8a4b06}
+
+@keyframes drop{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:none}}
+@keyframes slide{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes run{0%{transform:translateX(-110%)}100%{transform:translateX(360%)}}
+
+@media(max-width:980px){
+  #right{left:14px;right:14px;top:auto;bottom:14px;width:auto;height:44%;flex-direction:row}
+  #right>*{flex:1;min-width:0}#times{min-height:0}
+  #title{max-width:calc(100% - 28px);padding:10px 16px 10px 12px}#title p{display:none}
+  #slogan,#probe{display:none!important}
+}
 </style>
 </head>
 <body>
 <div id="map"></div>
 
-<div id="title">
-  <div class="ico">🚆</div>
+<header id="title">
+  <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C7.6 2 4 2.5 4 6v9.5A3.5 3.5 0 0 0 7.5 19L6 20.5v.5h2.2l2-2h3.6l2 2H18v-.5L16.5 19a3.5 3.5 0 0 0 3.5-3.5V6c0-3.5-3.6-4-8-4zM7.5 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3.5-6H6V6.5h5V10zm2 0V6.5h5V10h-5zm3.5 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
   <div>
     <h1>Bereikbaarheid Gent met de trein</h1>
     <h2>Vlaamse Ardennen en ruime omgeving</h2>
     <p>Kleuring = hoe dicht je bij een NMBS-station woont + hoe vlot je vanuit daar de trein naar Gent kan nemen</p>
   </div>
-</div>
+</header>
 
-<div id="hover" class="card"></div>
-<div id="status" class="card">Gegevens laden…</div>
+<div id="probe" class="card"></div>
+<div id="slogan">Dichter bij de natuur,<br>vlot naar Gent.</div>
+<div id="status" class="card">Kaartgegevens laden&hellip;<div class="bar"><i></i></div></div>
 
-<div id="panel">
-  <div class="card" id="ctl">
+<aside id="right">
+  <section class="card" id="ctl">
     <div class="seg">
-      <button id="mDist" class="on">Afstand tot station</button>
-      <button id="mTime">Totale reistijd naar Gent</button>
+      <button id="mDist">Afstand tot station</button>
+      <button id="mTime" class="on">Reistijd tot Gent</button>
     </div>
-    <div id="timeOpts" style="display:none">
-      <div class="row">Vervoer naar station: <b id="spdLbl"></b></div>
-      <input id="spd" type="range" min="4" max="45" step="1" value="15" />
-    </div>
-    <label class="opt"><input type="checkbox" id="hubsOnly" /> Enkel stations met rechtstreekse verbinding naar Gent</label>
-    <label class="opt"><input type="checkbox" id="showRail" checked /> Toon spoorlijnen &amp; stations (OSM)</label>
-    <label class="opt">Kaartlaag <input type="range" id="op" min="0.2" max="1" step="0.05" value="0.7" style="flex:1" /></label>
-  </div>
+    <div class="rng" id="spdRow"><span>Naar station:</span><input id="spd" type="range" min="4" max="50" step="1" value="16"><b id="spdL"></b></div>
+    <label class="opt"><input type="checkbox" id="direct"> Enkel rechtstreekse verbindingen</label>
+    <label class="opt"><input type="checkbox" id="rail" checked> Spoorlijnen tonen</label>
+    <div class="rng"><span>Dekking:</span><input id="op" type="range" min="0.25" max="1" step="0.05" value="0.78"></div>
+  </section>
 
-  <div class="card" id="legend"></div>
+  <section class="card" id="legend"></section>
 
-  <div class="card" id="list">
-    <h3>Indicatieve reistijd met de trein naar Gent</h3>
-    <input id="q" placeholder="Zoek station…" />
-    <ul id="stations"></ul>
-    <div class="note">Reistijden zijn indicatief (stations zonder gemeten tijd: schatting op basis van afstand). Bronnen: © OpenStreetMap-bijdragers (Overpass, ODbL) · gemeentegrenzen: Digitaal Vlaanderen / VRBG (geo.api.vlaanderen.be, Datavindplaats).</div>
-  </div>
-</div>
+  <section class="card" id="times">
+    <h3>Reistijd met de trein naar Gent</h3>
+    <input id="q" placeholder="Zoek een station&hellip;" />
+    <ul id="list"></ul>
+    <div class="note" id="src"></div>
+  </section>
+</aside>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/osmtogeojson@3.0.0-beta.5/osmtogeojson.js"></script>
 <script>
-const FLEMISH = ['Brakel','Horebeke','Kluisbergen','Kruisem','Lierde','Maarkedal','Oudenaarde','Ronse','Zottegem','Zwalm',
-  'Wortegem-Petegem','Geraardsbergen','Herzele','Sint-Lievens-Houtem','Galmaarden','Pajottegem','Gavere'];
-const WALLOON = ['Flobecq','Ellezelles','Frasnes-lez-Anvaing','Mont-de-l\'Enclus','Lessines','Ath'];
-const BBOX = [50.55, 3.2, 51.2, 4.3];            // S,W,N,E voor stations en spoor
-const GENT = { lat:51.0357, lon:3.7106 };        // Gent-Sint-Pieters
-const OVERPASS = ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
-const COLORS = ['#2fa34b','#9ad94b','#ffe433','#ff9a2e','#e5392f','#99112e'];
-const DEFS = {
-  dist: { cuts:[5,10,15,20,25], unit:'km', title:'Afstand tot een NMBS-station',
-          names:['zeer goed','goed','matig','beperkt','slecht','zeer slecht'] },
-  time: { cuts:[30,45,60,75,90], unit:'min', title:'Geschatte reistijd naar Gent (deur tot deur)',
-          names:['zeer goed','goed','matig','beperkt','slecht','zeer slecht'] }
+const COLORS=['#2f9e4f','#8ed24a','#f7e03d','#f79a35','#e8402e','#8f1b2e'];
+const QUAL=['zeer goed','goed','matig','beperkt','slecht','zeer slecht'];
+const MODES={
+  dist:{cuts:[2,4,6,8,10],unit:'km',title:'Afstand tot een NMBS-station'},
+  time:{cuts:[30,45,60,75,90],unit:'min',title:'Reistijd tot Gent (deur tot deur)'}
 };
-// Indicatieve treintijden (min) naar Gent-Sint-Pieters en stations met rechtstreekse verbinding
-const KNOWN = [
-  [/oudenaarde/i,17],[/ronse|renaix/i,33],[/geraardsbergen/i,36],[/zottegem/i,24],[/munkzwalm/i,28],[/lierde/i,32],
-  [/^aalst$/i,41],[/lessines|lessen/i,48],[/^ath$/i,54],[/frasnes/i,56],[/gavere/i,12],[/sint-denijs-boekel/i,20],
-  [/herzele/i,30],[/eine/i,21],[/galmaarden/i,40]
-];
-const HUBS = /oudenaarde|ronse|renaix|geraardsbergen|zottegem|munkzwalm|lierde|lessines|lessen|^ath$|frasnes|gavere|sint-denijs-boekel|herzele|eine$|galmaarden|^aalst$/i;
+const TRAIN='<svg viewBox="0 0 24 24"><path d="M12 2C7.6 2 4 2.5 4 6v9.5A3.5 3.5 0 0 0 7.5 19L6 20.5v.5h2.2l2-2h3.6l2 2H18v-.5L16.5 19a3.5 3.5 0 0 0 3.5-3.5V6c0-3.5-3.6-4-8-4zM7.5 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3.5-6H6V6.5h5V10zm2 0V6.5h5V10h-5zm3.5 6a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>';
+const $=id=>document.getElementById(id);
+const S={mode:'time',speed:16,direct:false,solo:null};
 
-const state = { mode:'dist', speed:15, hubsOnly:false };
-let stations = [], regionGeo = null, W = 0, H = 0, bounds = null, mercBox = null;
-let mask = null, overlay = null, railLayer, stLayer, lastCounts = [];
-
-const $ = id => document.getElementById(id);
-const map = L.map('map', { zoomControl:false }).setView([50.86, 3.73], 10);
-L.control.zoom({ position:'bottomleft' }).addTo(map);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:18, attribution:'© OpenStreetMap-bijdragers · © Digitaal Vlaanderen (VRBG)' }).addTo(map);
-
-const setStatus = (t, err) => { $('status').innerHTML = t ? `<span class="${err?'err':''}">${t}</span>` : ''; $('status').style.display = t ? '' : 'none'; };
-
-async function cached(key, fn) {
-  try { const c = localStorage.getItem(key); if (c) return JSON.parse(c); } catch {}
-  const v = await fn();
-  try { localStorage.setItem(key, JSON.stringify(v)); } catch {}
-  return v;
+/* ---------- kaart: labels bovenop de kleuring ---------- */
+const map=L.map('map',{zoomControl:false,minZoom:8,maxZoom:15,zoomSnap:.25}).setView([50.84,3.76],10);
+for(const [p,z] of [['base-pane',200],['heat',350],['rail',400],['edge',410],['labels',430]]){
+  map.createPane(p).style.zIndex=z;
+  if(p!=='base-pane')map.getPane(p).style.pointerEvents='none';
 }
-async function overpass(q) {
-  let last;
-  for (let round = 0; round < 4; round++) {
-    for (const url of OVERPASS) {
-      try {
-        const r = await fetch(url, { method:'POST', body:'data=' + encodeURIComponent(q) });
-        if (r.ok) return r.json();
-        last = new Error('Overpass ' + r.status);
-      } catch (e) { last = e; }
-    }
-    await new Promise(res => setTimeout(res, 2000));
-  }
-  throw last;
-}
-const bb = BBOX.join(',');
-
-async function loadRegion() {
-  const names = FLEMISH.map(n => `'${n}'`).join(',');
-  const url = 'https://geo.api.vlaanderen.be/VRBG/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=VRBG:Refgem'
-    + '&outputFormat=application/json&srsName=EPSG:4326&propertyName=NAAM&CQL_FILTER=' + encodeURIComponent(`NAAM IN (${names})`);
-  const flem = await cached('kaartje.vrbg.v1', async () => { const r = await fetch(url); if (!r.ok) throw new Error('VRBG ' + r.status); return r.json(); });
-  const q = `[out:json][timeout:90];relation["boundary"="administrative"]["admin_level"="8"]["name"~"^(${WALLOON.join('|')})$"](50.5,3.3,50.95,4.3);out geom;`;
-  let wal = { features:[] };
-  try { wal = await cached('kaartje.walloon.v1', async () => osmtogeojson(await overpass(q))); }
-  catch (e) { console.warn('Waalse gemeenten niet geladen', e); }
-  const feats = [...flem.features, ...wal.features.filter(f => /Polygon/.test(f.geometry.type))];
-  return { type:'FeatureCollection', features:feats };
-}
-async function loadStations() {
-  const q = `[out:json][timeout:90];node["railway"~"^(station|halt)$"]["name"](${bb});out body;`;
-  const raw = await cached('kaartje.stations.v1', () => overpass(q));
-  const seen = new Set();
-  return raw.elements.filter(e => !e.tags.disused && !/subway|light_rail|tram/.test(e.tags.station || ''))
-    .filter(e => !seen.has(e.tags.name) && seen.add(e.tags.name))
-    .map(e => ({ name:e.tags.name, lat:e.lat, lon:e.lon }));
-}
-async function loadRail() {
-  const q = `[out:json][timeout:120];way["railway"="rail"][!"service"](${bb});out geom qt;`;
-  return cached('kaartje.rail.v1', async () => {
-    const d = await overpass(q);
-    return d.elements.filter(w => w.geometry).map(w => w.geometry.map(p => [+p.lat.toFixed(5), +p.lon.toFixed(5)]));
-  });
-}
-
-const km = (a, b) => {
-  const kx = Math.cos((a.lat + b.lat) * Math.PI / 360) * 111.32;
-  return Math.hypot((a.lon - b.lon) * kx, (a.lat - b.lat) * 110.57);
+// Esri Light Gray Canvas: geen API-sleutel nodig en heeft een aparte labellaag,
+// zodat plaatsnamen bovenop de kleuring blijven staan (zoals op de posterkaart).
+const ESRI='https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_';
+const ATTR='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &middot; '
+  +'Tiles &copy; <a href="https://www.esri.com/">Esri</a> &middot; '
+  +'NMBS via <a href="https://docs.irail.be/">iRail</a> &middot; Digitaal Vlaanderen (VRBG)';
+const BASES={
+  'Licht (Esri)':L.tileLayer(ESRI+'Base/MapServer/tile/{z}/{y}/{x}',{pane:'base-pane',maxZoom:16,attribution:ATTR}),
+  'OpenStreetMap':L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{pane:'base-pane',maxZoom:19,attribution:ATTR})
 };
-function prepStations() {
-  const g = stations.find(s => /gent-sint-pieters/i.test(s.name));
-  for (const s of stations) {
-    s.hub = HUBS.test(s.name);
-    const k = KNOWN.find(([re]) => re.test(s.name));
-    s.known = !!k;
-    s.train = /gent-sint-pieters/i.test(s.name) ? 0 : k ? k[1] : Math.round(3 + km(s, g || GENT) * 0.95);
-  }
+BASES['Licht (Esri)'].addTo(map);
+const LABELS=L.tileLayer(ESRI+'Reference/MapServer/tile/{z}/{y}/{x}',{pane:'labels',maxZoom:16}).addTo(map);
+L.control.layers(BASES,{'Plaatsnamen bovenop':LABELS},{position:'bottomleft',collapsed:true}).addTo(map);
+// OSM heeft zelf al plaatsnamen: dan de extra labellaag weglaten.
+map.on('baselayerchange',e=>{e.name==='OpenStreetMap'?map.removeLayer(LABELS):map.addLayer(LABELS);});
+L.control.zoom({position:'bottomleft'}).addTo(map);
+L.control.scale({metric:true,imperial:false,position:'bottomright',maxWidth:170}).addTo(map);
+
+const setStatus=(t,err)=>{const s=$('status');if(!t){s.style.display='none';return;}
+  s.style.display='';s.innerHTML=(err?`<span class="err">${t}</span>`:t)+(err?'':'<div class="bar"><i></i></div>');};
+const getJSON=async u=>{const r=await fetch(u);if(!r.ok)throw new Error(u.split('/').pop()+' '+r.status);return r.json();};
+
+let region,outline,stations=[],railLines=[],meta={},railLayer;
+async function load(){
+  [region,stations]=await Promise.all([getJSON('data/region.geojson'),getJSON('data/stations.json')]);
+  try{outline=await getJSON('data/outline.geojson');}catch(e){console.warn('omtrek',e);}
+  try{railLines=await getJSON('data/rail.json');}catch(e){console.warn('spoorlijnen',e);}
+  try{meta=await getJSON('data/meta.json');}catch(e){}
+  stations.forEach(s=>{s.ll=L.latLng(s.lat,s.lon);s.title=s.label||s.name;});
 }
 
-// ---------- raster in Mercator-ruimte ----------
-function setupRaster() {
-  const crs = L.CRS.EPSG3857;
-  let minX = 1e12, minY = 1e12, maxX = -1e12, maxY = -1e12;
-  const each = (c, d, f) => d === 0 ? f(c) : c.forEach(x => each(x, d - 1, f));
-  for (const ft of regionGeo.features) {
-    const d = ft.geometry.type === 'Polygon' ? 2 : 3;
-    each(ft.geometry.coordinates, d, ([lon, lat]) => {
-      const p = crs.project(L.latLng(lat, lon));
-      minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y);
-    });
-  }
-  mercBox = { minX, minY, maxX, maxY };
-  W = 900; H = Math.round(W * (maxY - minY) / (maxX - minX));
-  const sw = crs.unproject(L.point(minX, minY)), ne = crs.unproject(L.point(maxX, maxY));
-  bounds = L.latLngBounds(sw, ne);
-  // maskerend: enkel binnen de regio inkleuren
-  const c = document.createElement('canvas'); c.width = W; c.height = H;
-  const x = c.getContext('2d'); x.fillStyle = '#000';
-  const tx = ([lon, lat]) => { const p = crs.project(L.latLng(lat, lon)); return [(p.x - minX) / (maxX - minX) * W, (maxY - p.y) / (maxY - minY) * H]; };
-  for (const ft of regionGeo.features) {
-    const polys = ft.geometry.type === 'Polygon' ? [ft.geometry.coordinates] : ft.geometry.coordinates;
+/* ---------- regiomasker + hexraster ---------- */
+let mask,MW,MH,box,bounds,hexes=[],overlay,cnv,HEXR=7.2;
+function buildMask(){
+  const crs=L.CRS.EPSG3857;let a=1e12,b=1e12,c=-1e12,d=-1e12;
+  const walk=(co,dep,f)=>dep?co.forEach(x=>walk(x,dep-1,f)):f(co);
+  region.features.forEach(ft=>walk(ft.geometry.coordinates,ft.geometry.type==='Polygon'?2:3,([lon,lat])=>{
+    const p=crs.project(L.latLng(lat,lon));a=Math.min(a,p.x);c=Math.max(c,p.x);b=Math.min(b,p.y);d=Math.max(d,p.y);}));
+  box={a,b,c,d};MW=1100;MH=Math.round(MW*(d-b)/(c-a));
+  bounds=L.latLngBounds(crs.unproject(L.point(a,b)),crs.unproject(L.point(c,d)));
+  cnv=document.createElement('canvas');cnv.width=MW;cnv.height=MH;
+  const x=cnv.getContext('2d');
+  const tx=([lon,lat])=>{const p=crs.project(L.latLng(lat,lon));return[(p.x-a)/(c-a)*MW,(d-p.y)/(d-b)*MH];};
+  x.fillStyle='#000';
+  region.features.forEach(ft=>{
+    const polys=ft.geometry.type==='Polygon'?[ft.geometry.coordinates]:ft.geometry.coordinates;
     x.beginPath();
-    for (const poly of polys) for (const ring of poly) {
-      ring.forEach((pt, i) => { const [px, py] = tx(pt); i ? x.lineTo(px, py) : x.moveTo(px, py); });
-      x.closePath();
-    }
+    polys.forEach(poly=>poly.forEach(ring=>{
+      ring.forEach((pt,i)=>{const[px,py]=tx(pt);i?x.lineTo(px,py):x.moveTo(px,py);});x.closePath();}));
     x.fill('evenodd');
-  }
-  mask = x.getImageData(0, 0, W, H).data;
-  mask.tx = tx;
+  });
+  mask=x.getImageData(0,0,MW,MH).data;mask.tx=tx;
+  x.clearRect(0,0,MW,MH);
 }
-const insideRegion = s => {
-  const [px, py] = mask.tx([s.lon, s.lat]);
-  const ix = Math.round(px), iy = Math.round(py);
-  return ix >= 0 && iy >= 0 && ix < W && iy < H && mask[(iy * W + ix) * 4 + 3] > 128;
-};
+const hit=(i,j)=>i>=0&&j>=0&&i<MW&&j<MH&&mask[(j*MW+i)*4+3]>128;
+const inRegion=(lat,lon)=>{const[px,py]=mask.tx([lon,lat]);return hit(Math.round(px),Math.round(py));};
 
-const candidates = () => stations.filter(s => !state.hubsOnly || s.hub || /gent-sint-pieters/i.test(s.name));
-const accessMin = d => d * 1.3 * 60 / state.speed;
-const value = (s, d) => state.mode === 'dist' ? d : accessMin(d) + s.train;
-const bandOf = v => { const c = DEFS[state.mode].cuts; let i = 0; while (i < c.length && v > c[i]) i++; return i; };
-
-function render() {
-  const cs = candidates(), crs = L.CRS.EPSG3857;
-  const out = new ImageData(W, H), px = out.data, counts = new Array(6).fill(0);
-  const { minX, minY, maxX, maxY } = mercBox;
-  const rgb = COLORS.map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)));
-  const colLon = new Float64Array(W);
-  for (let i = 0; i < W; i++) colLon[i] = crs.unproject(L.point(minX + (i + .5) / W * (maxX - minX), minY)).lng;
-  let total = 0;
-  for (let y = 0; y < H; y++) {
-    const lat = crs.unproject(L.point(minX, maxY - (y + .5) / H * (maxY - minY))).lat;
-    const kx = Math.cos(lat * Math.PI / 180) * 111.32;
-    for (let x = 0; x < W; x++) {
-      const o = (y * W + x) * 4;
-      if (mask[o + 3] < 128) continue;
-      let best = Infinity;
-      for (const s of cs) {
-        const d = Math.hypot((colLon[x] - s.lon) * kx, (lat - s.lat) * 110.57);
-        const v = value(s, d); if (v < best) best = v;
-      }
-      const b = bandOf(best); counts[b]++; total++;
-      px[o] = rgb[b][0]; px[o + 1] = rgb[b][1]; px[o + 2] = rgb[b][2]; px[o + 3] = 255;
+function buildHexes(){
+  const crs=L.CRS.EPSG3857,{a,b,c,d}=box,R=HEXR,hw=Math.sqrt(3)*R,vs=1.5*R;
+  hexes=[];
+  for(let row=0;row*vs<MH+R;row++){
+    const y=row*vs,off=row%2?hw/2:0;
+    for(let x=off;x<MW+hw;x+=hw){
+      if(!hit(Math.round(x),Math.round(y)))continue;
+      const p=crs.unproject(L.point(a+x/MW*(c-a),d-y/MH*(d-b)));
+      hexes.push({x,y,lat:p.lat,lon:p.lng,kx:Math.cos(p.lat*Math.PI/180)*111.32});
     }
   }
-  const c = document.createElement('canvas'); c.width = W; c.height = H;
-  c.getContext('2d').putImageData(out, 0, 0);
-  const url = c.toDataURL();
-  if (overlay) overlay.setUrl(url); else { overlay = L.imageOverlay(url, bounds, { opacity:+$('op').value, interactive:false }).addTo(map); overlay.bringToBack(); }
-  lastCounts = counts.map(n => total ? n / total : 0);
-  renderLegend(); renderList();
 }
 
-function renderLegend() {
-  const d = DEFS[state.mode], c = d.cuts, u = d.unit;
-  const lbl = i => i === 0 ? `0 – ${c[0]} ${u}` : i === c.length ? `> ${c[c.length - 1]} ${u}` : `${c[i - 1]} – ${c[i]} ${u}`;
-  $('legend').innerHTML = `<h3>${d.title}</h3>` + COLORS.map((col, i) =>
-    `<div class="row"><span class="sw" style="background:${col}"></span>${lbl(i)} <span style="opacity:.7">(${d.names[i]})</span><span class="pct">${(lastCounts[i] * 100).toFixed(0)}% van de regio</span></div>`).join('')
-    + `<div class="row" style="margin-top:8px"><span class="hubIcon" style="width:22px;height:22px">🚆</span>Station met rechtstreekse verbinding naar Gent</div>
-       <div class="row"><span class="sw" style="background:none;border:2px dashed #35506a"></span>Gemeentegrens regio</div>`;
-}
-function renderList() {
-  const q = $('q').value.trim().toLowerCase();
-  const items = stations.filter(s => s.train > 0 && insideRegion(s) && s.name.toLowerCase().includes(q))
-    .sort((a, b) => a.train - b.train);
-  $('stations').innerHTML = items.map((s, i) => `<li data-i="${stations.indexOf(s)}"><span>${s.hub ? '🚆 ' : ''}${s.name}</span><b>${s.known ? '±' : '~'} ${s.train} min</b></li>`).join('')
-    || '<li>Geen stations gevonden</li>';
-}
-
-function drawLayers() {
-  L.geoJSON(regionGeo, { style:{ color:'#35506a', weight:1.6, dashArray:'6 5', fill:false }, interactive:false }).addTo(map);
-  railLayer = L.layerGroup(rail.map(g => L.polyline(g, { color:'#2b3f55', weight:1.6, opacity:.85, interactive:false }))).addTo(map);
-  stLayer = L.layerGroup(stations.map(s => {
-    const m = s.hub
-      ? L.marker([s.lat, s.lon], { icon:L.divIcon({ className:'', html:'<div class="hubIcon" style="width:24px;height:24px">🚆</div>', iconSize:[24, 24] }) })
-          .bindTooltip(s.name, { permanent:map.getZoom() >= 0, direction:'right', className:'lbl', offset:[10, 0] })
-      : L.circleMarker([s.lat, s.lon], { radius:4, color:'#243b53', weight:1.5, fillColor:'#fff', fillOpacity:1 }).bindTooltip(s.name, { className:'lbl' });
-    s.marker = m; m.bindPopup(() => popup(s)); return m;
-  })).addTo(map);
-  map.fitBounds(bounds);
-}
-const popup = s => `<b>${s.name}</b><br>${s.hub ? 'Rechtstreekse verbinding naar Gent<br>' : 'Overstap naar Gent nodig (mogelijk)<br>'}Treintijd naar Gent: ${s.known ? '±' : '~'} ${s.train} min`;
-
-map.on('mousemove', e => {
-  if (!mask) return;
-  const cs = candidates(); let best = null, bd = Infinity, bv = Infinity;
-  for (const s of cs) { const d = km({ lat:e.latlng.lat, lon:e.latlng.lng }, s), v = value(s, d); if (v < bv) { bv = v; bd = d; best = s; } }
-  const h = $('hover');
-  h.style.display = 'block';
-  h.innerHTML = `Dichtste station: <b>${best.name}</b> (${bd.toFixed(1)} km)<br>Treintijd ± ${best.train} min · totaal geschat ± ${Math.round(accessMin(bd) + best.train)} min`;
-});
-map.on('mouseout', () => $('hover').style.display = 'none');
-
-// ---------- UI ----------
-function setMode(m) {
-  state.mode = m; $('mDist').classList.toggle('on', m === 'dist'); $('mTime').classList.toggle('on', m === 'time');
-  $('timeOpts').style.display = m === 'time' ? '' : 'none'; if (mask) render();
-}
-$('mDist').onclick = () => setMode('dist'); $('mTime').onclick = () => setMode('time');
-const spdTxt = () => { const v = +$('spd').value; $('spdLbl').textContent = `${v} km/u (${v <= 6 ? 'te voet' : v <= 25 ? 'fiets' : 'auto'})`; };
-$('spd').oninput = () => { state.speed = +$('spd').value; spdTxt(); render(); }; spdTxt();
-$('hubsOnly').onchange = e => { state.hubsOnly = e.target.checked; render(); };
-$('op').oninput = e => overlay && overlay.setOpacity(+e.target.value);
-$('q').oninput = renderList;
-$('showRail').onchange = e => { for (const l of [railLayer, stLayer]) e.target.checked ? map.addLayer(l) : map.removeLayer(l); };
-$('stations').onclick = e => {
-  const li = e.target.closest('li'); if (!li || li.dataset.i === undefined) return;
-  const s = stations[+li.dataset.i]; map.flyTo([s.lat, s.lon], 13); s.marker.openPopup();
+/* ---------- berekening + tekenen ---------- */
+const pool=()=>stations.filter(s=>!S.direct||s.direct||s.train===0);
+const access=km=>km*1.32*60/S.speed;
+const bandOf=v=>{const c=MODES[S.mode].cuts;let i=0;while(i<c.length&&v>c[i])i++;return i;};
+const nearest=(lat,lon)=>{
+  const kx=Math.cos(lat*Math.PI/180)*111.32;let bv=Infinity,bd=0,bs=null;
+  for(const s of pool()){
+    const d=Math.hypot((lon-s.lon)*kx,(lat-s.lat)*110.57);
+    const v=S.mode==='dist'?d:access(d)+s.train;
+    if(v<bv){bv=v;bd=d;bs=s;}
+  }
+  return{v:bv,d:bd,s:bs};
 };
+let shares=[0,0,0,0,0,0];
 
-let rail = [];
-(async () => {
-  try {
-    setStatus('Gemeentegrenzen (Digitaal Vlaanderen) en OSM-gegevens laden…');
-    const [reg, st] = await Promise.all([loadRegion(), loadStations()]);
-    regionGeo = reg; stations = st; prepStations();
-    setStatus('Spoorlijnen (OSM) laden…');
-    try { rail = await loadRail(); } catch (e) { console.warn(e); }
-    setupRaster(); drawLayers(); render();
+function compute(){
+  const cs=pool(),cnt=[0,0,0,0,0,0];
+  for(const H of hexes){
+    let bv=Infinity;
+    for(const s of cs){
+      const dx=(H.lon-s.lon)*H.kx,dy=(H.lat-s.lat)*110.57,d=Math.sqrt(dx*dx+dy*dy);
+      const v=S.mode==='dist'?d:access(d)+s.train;
+      if(v<bv)bv=v;
+    }
+    H.b=bandOf(bv);cnt[H.b]++;
+  }
+  shares=cnt.map(v=>v/(hexes.length||1));
+  paint();legend();
+}
+function paint(){
+  const g=cnv.getContext('2d'),R=HEXR;
+  g.clearRect(0,0,MW,MH);g.lineWidth=.6;g.lineJoin='round';
+  const pts=[];for(let i=0;i<6;i++){const t=Math.PI/180*(60*i-90);pts.push([Math.cos(t)*R,Math.sin(t)*R]);}
+  g.strokeStyle='rgba(255,255,255,.42)';
+  for(const H of hexes){
+    g.globalAlpha=(S.solo!==null&&S.solo!==H.b)?.1:1;
+    g.fillStyle=COLORS[H.b];
+    g.beginPath();pts.forEach(([dx,dy],i)=>i?g.lineTo(H.x+dx,H.y+dy):g.moveTo(H.x+dx,H.y+dy));g.closePath();
+    g.fill();g.stroke();
+  }
+  g.globalAlpha=1;
+  const url=cnv.toDataURL();
+  if(overlay)overlay.setUrl(url);
+  else overlay=L.imageOverlay(url,bounds,{pane:'heat',opacity:+$('op').value}).addTo(map);
+}
+
+/* ---------- panelen ---------- */
+function legend(){
+  const M=MODES[S.mode],c=M.cuts,u=M.unit;
+  const lab=i=>i===0?`0 – ${c[0]} ${u}`:i===c.length?`> ${c[c.length-1]} ${u}`:`${c[i-1]} – ${c[i]} ${u}`;
+  $('legend').innerHTML=`<h3>${M.title}</h3>`+COLORS.map((col,i)=>
+    `<div class="band${S.solo!==null&&S.solo!==i?' off':''}" data-b="${i}">
+       <span class="sw" style="background:${col}"></span><span>${lab(i)}</span>
+       <span class="q">(${QUAL[i]})</span><span class="pct">${(shares[i]*100).toFixed(0)}%</span></div>`).join('')
+  +`<div class="sep"></div>
+    <div class="sym"><i><svg width="30" height="8"><line x1="0" y1="4" x2="30" y2="4" stroke="#2b3f55" stroke-width="2"/></svg></i>NMBS-spoorlijn</div>
+    <div class="sym"><i><span class="halt"></span></i>NMBS-station of stopplaats</div>
+    <div class="sym"><i><span style="width:19px;height:19px;border-radius:5px;background:var(--navy);border:1.5px solid #fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="12" height="12" fill="#fff"><path d="M12 2C7.6 2 4 2.5 4 6v9.5A3.5 3.5 0 0 0 7.5 19L6 20.5v.5h2.2l2-2h3.6l2 2H18v-.5L16.5 19a3.5 3.5 0 0 0 3.5-3.5V6c0-3.5-3.6-4-8-4z"/></svg></span></i>Station met <b>rechtstreekse</b> verbinding naar Gent</div>
+    <div class="sym"><i><svg width="30" height="8"><line x1="0" y1="4" x2="30" y2="4" stroke="#35506a" stroke-width="2" stroke-dasharray="5 4"/></svg></i>Regio Vlaamse Ardennen</div>`;
+  $('legend').querySelectorAll('.band').forEach(el=>el.onclick=()=>{
+    const b=+el.dataset.b;S.solo=S.solo===b?null:b;paint();legend();});
+}
+function list(){
+  const q=$('q').value.trim().toLowerCase();
+  const items=stations.filter(s=>s.train>0&&(!S.direct||s.direct)&&s.title.toLowerCase().includes(q))
+    .sort((a,b)=>a.train-b.train);
+  $('list').innerHTML=items.map(s=>
+    `<li data-id="${s.id}"><span class="dot${s.direct?' direct':''}"></span>
+      <span class="nm">${s.title}</span><b>${s.train} min</b></li>`).join('')
+    ||'<li style="opacity:.6;background:none;cursor:default">Geen station gevonden</li>';
+  $('list').querySelectorAll('li[data-id]').forEach(li=>li.onclick=()=>{
+    const s=stations.find(x=>x.id===li.dataset.id);
+    map.flyTo(s.ll,13,{duration:.8});setTimeout(()=>s.marker&&s.marker.openPopup(),850);});
+}
+
+/* ---------- lagen ---------- */
+const pop=s=>`<div class="pop"><h4>${s.title}</h4>
+  <div class="big">${s.train} min</div>
+  <div style="opacity:.7;font-size:11.5px">naar Gent-Sint-Pieters${s.typical&&s.typical>s.train?` &middot; doorsnee ${s.typical} min`:''}</div>
+  <span class="tag${s.direct?'':' t'}">${s.direct?'Rechtstreekse trein':(s.transfers||1)+' overstap'+((s.transfers||1)>1?'pen':'')}</span>
+  <div class="note" style="margin-top:8px">Dienstregeling NMBS via iRail${s.runs?` &middot; ${s.runs} ritten vergeleken`:''}</div></div>`;
+
+/* Welke stations bedienen de regio echt? Een station telt mee zodra het voor
+   minstens één hexagon het dichtstbijzijnde is. Alleen die krijgen een naamlabel,
+   net als op de posterkaart. */
+function markServing(){
+  stations.forEach(s=>s.serves=0);
+  for(const H of hexes){
+    let bd=Infinity,bs=null;
+    for(const s of stations){
+      const dx=(H.lon-s.lon)*H.kx,dy=(H.lat-s.lat)*110.57,d=dx*dx+dy*dy;
+      if(d<bd){bd=d;bs=s;}
+    }
+    if(bs)bs.serves++;
+  }
+}
+
+function draw(){
+  L.geoJSON(region,{pane:'edge',interactive:false,
+    style:{color:'#4a6276',weight:.8,fill:false,opacity:.45}}).addTo(map);
+  if(outline)L.geoJSON(outline,{pane:'edge',interactive:false,
+    style:{color:'#20364b',weight:2.4,dashArray:'8 5',fill:false,opacity:.95,lineJoin:'round'}}).addTo(map);
+  if(railLines.length){
+    railLayer=L.layerGroup(railLines.map(g=>
+      L.polyline(g,{pane:'rail',color:'#2b3f55',weight:1.5,opacity:.8,interactive:false}))).addTo(map);
+  }
+  stations.forEach(s=>{
+    const key=s.serves>0&&s.train>0;
+    const m=key&&s.direct
+      ? L.marker(s.ll,{zIndexOffset:500,riseOnHover:true,icon:L.divIcon({className:'',iconSize:null,iconAnchor:[13,13],
+          html:`<div class="hub"><span class="pin">${TRAIN}</span><span class="nm">${s.title}</span></div>`})})
+      : L.marker(s.ll,{zIndexOffset:key?200:0,icon:L.divIcon({className:'',iconSize:[9,9],iconAnchor:[4.5,4.5],
+          html:`<span class="halt${key?' key':''}"></span>`})})
+          .bindTooltip(s.title,{className:'plain',direction:'top',offset:[0,-5],permanent:key});
+    if(s.train>0)m.bindPopup(()=>pop(s),{closeButton:false,offset:[0,-4]});
+    s.marker=m;m.addTo(map);
+  });
+  const g=stations.find(s=>s.train===0);
+  if(g)L.circleMarker(g.ll,{radius:9,color:'#fff',weight:3,fillColor:'#0d3c6e',fillOpacity:1})
+    .bindTooltip('Gent-Sint-Pieters',{className:'plain',permanent:true,direction:'top',offset:[0,-9]}).addTo(map);
+}
+
+/* ---------- interactie ---------- */
+map.on('mousemove',e=>{
+  if(!hexes.length)return;
+  const{lat,lng}=e.latlng;
+  if(!inRegion(lat,lng)){$('probe').style.display='none';return;}
+  const n=nearest(lat,lng);if(!n.s)return;
+  $('probe').style.display='block';
+  $('probe').innerHTML=`<div class="h">${n.s.title}</div>
+    <div>Dichtstbijzijnde station &middot; <span class="v">${n.d.toFixed(1)} km</span></div>
+    <div>Trein naar Gent &middot; <span class="v">${n.s.train} min</span>${n.s.direct?' (rechtstreeks)':''}</div>
+    <div style="margin-top:4px;font-weight:700">Totaal ± <span class="v">${Math.round(access(n.d)+n.s.train)} min</span> deur tot deur</div>`;
+});
+map.on('mouseout',()=>$('probe').style.display='none');
+
+const setMode=m=>{S.mode=m;$('mDist').classList.toggle('on',m==='dist');$('mTime').classList.toggle('on',m==='time');
+  $('spdRow').hidden=m!=='time';compute();};
+$('mDist').onclick=()=>setMode('dist');
+$('mTime').onclick=()=>setMode('time');
+const spdL=()=>{const v=+$('spd').value;$('spdL').textContent=`${v} km/u · ${v<=6?'te voet':v<=27?'fiets':'auto'}`;};
+$('spd').oninput=()=>{S.speed=+$('spd').value;spdL();compute();};
+$('direct').onchange=e=>{S.direct=e.target.checked;compute();list();};
+$('rail').onchange=e=>{if(railLayer)e.target.checked?map.addLayer(railLayer):map.removeLayer(railLayer);};
+$('op').oninput=e=>overlay&&overlay.setOpacity(+e.target.value);
+$('q').oninput=list;
+spdL();
+
+/* ---------- start ---------- */
+(async()=>{
+  try{
+    await load();
+    setStatus('Kaart opbouwen&hellip;');
+    buildMask();buildHexes();markServing();draw();compute();list();
+    $('src').innerHTML='Reistijden: dienstregeling NMBS via <a href="https://docs.irail.be/" target="_blank" rel="noopener">iRail</a>'
+      +(meta.built?` (${meta.built.slice(0,10)})`:'')
+      +'. Gemeentegrenzen: Digitaal Vlaanderen (VRBG) &amp; OpenStreetMap. "Reistijd tot Gent" = toegang tot het station + treinrit.';
+    map.fitBounds(bounds,{padding:[30,30],animate:false});
     setStatus('');
-  } catch (e) {
-    console.error(e); setStatus('Laden mislukt: ' + e.message + '. Probeer later opnieuw (Overpass kan druk zijn).', true);
+  }catch(e){
+    console.error(e);
+    setStatus(`Kon de gegevens niet laden (${e.message}).<br><br>Draai eerst <b>python build_data.py</b> zodat de map <code>data/</code> gevuld is.`,true);
   }
 })();
 </script>
