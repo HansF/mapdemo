@@ -305,10 +305,10 @@ function legend(){
        <span class="sw" style="background:${col}"></span><span>${lab(i)}</span>
        <span class="q">(${QUAL[i]})</span><span class="pct">${(shares[i]*100).toFixed(0)}%</span></div>`).join('')
   +`<div class="sep"></div>
-    <div class="sym"><i><svg width="30" height="8"><line x1="0" y1="4" x2="30" y2="4" stroke="#2b3f55" stroke-width="2"/></svg></i>NMBS-spoorlijn</div>
-    <div class="sym"><i><span class="halt"></span></i>NMBS-station of stopplaats</div>
-    <div class="sym"><i><span style="width:19px;height:19px;border-radius:5px;background:var(--navy);border:1.5px solid #fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="12" height="12" fill="#fff"><path d="M12 2C7.6 2 4 2.5 4 6v9.5A3.5 3.5 0 0 0 7.5 19L6 20.5v.5h2.2l2-2h3.6l2 2H18v-.5L16.5 19a3.5 3.5 0 0 0 3.5-3.5V6c0-3.5-3.6-4-8-4z"/></svg></span></i>Station met <b>rechtstreekse</b> verbinding naar Gent</div>
-    <div class="sym"><i><svg width="30" height="8"><line x1="0" y1="4" x2="30" y2="4" stroke="#35506a" stroke-width="2" stroke-dasharray="5 4"/></svg></i>Regio Vlaamse Ardennen</div>`;
+    <div class="sym"><i><svg width="30" height="8"><line x1="0" y1="4" x2="30" y2="4" stroke="#2b3f55" stroke-width="2"/></svg></i><span>NMBS-spoorlijn</span></div>
+    <div class="sym"><i><span class="halt"></span></i><span>NMBS-station of stopplaats</span></div>
+    <div class="sym"><i><span style="width:19px;height:19px;border-radius:5px;background:var(--navy);border:1.5px solid #fff;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="12" height="12" fill="#fff"><path d="M12 2C7.6 2 4 2.5 4 6v9.5A3.5 3.5 0 0 0 7.5 19L6 20.5v.5h2.2l2-2h3.6l2 2H18v-.5L16.5 19a3.5 3.5 0 0 0 3.5-3.5V6c0-3.5-3.6-4-8-4z"/></svg></span></i><span>Station met <b>rechtstreekse</b> verbinding naar Gent</span></div>
+    <div class="sym"><i><svg width="30" height="8"><line x1="0" y1="4" x2="30" y2="4" stroke="#35506a" stroke-width="2" stroke-dasharray="5 4"/></svg></i><span>Regio Vlaamse Ardennen</span></div>`;
   $('legend').querySelectorAll('.band').forEach(el=>el.onclick=()=>{
     const b=+el.dataset.b;S.solo=S.solo===b?null:b;paint();legend();});
 }
@@ -333,10 +333,11 @@ const pop=s=>`<div class="pop"><h4>${s.title}</h4>
   <div class="note" style="margin-top:8px">Dienstregeling NMBS via iRail${s.runs?` &middot; ${s.runs} ritten vergeleken`:''}</div></div>`;
 
 /* Welke stations bedienen de regio echt? Een station telt mee zodra het voor
-   minstens één hexagon het dichtstbijzijnde is. Alleen die krijgen een naamlabel,
-   net als op de posterkaart. */
+   minstens één hexagon het dichtstbijzijnde is. Alleen de belangrijkste daarvan
+   krijgen een naamlabel, net als op de posterkaart — de rest blijft een stip. */
+const MAXLABELS=16;
 function markServing(){
-  stations.forEach(s=>s.serves=0);
+  stations.forEach(s=>{s.serves=0;s.labeled=false;});
   for(const H of hexes){
     let bd=Infinity,bs=null;
     for(const s of stations){
@@ -345,6 +346,10 @@ function markServing(){
     }
     if(bs)bs.serves++;
   }
+  stations.filter(s=>s.serves>0&&s.train>0&&s.direct)
+    .sort((a,b)=>b.serves-a.serves)
+    .slice(0,MAXLABELS)
+    .forEach(s=>s.labeled=true);
 }
 
 function draw(){
