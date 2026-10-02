@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23114b86'/%3E%3Cpath fill='%23fff' d='M12 4C9 4 7 4.4 7 6.6v6.6a2.4 2.4 0 0 0 2.4 2.4L8.4 16.6v.4h1.5l1.4-1.4h1.4L14.1 17h1.5v-.4l-1-1a2.4 2.4 0 0 0 2.4-2.4V6.6C17 4.4 15 4 12 4zM9.6 14a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm1.6-4.4H8.4V7.4h2.8zm1.6 0V7.4h2.8v2.2zm1.6 4.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2z'/%3E%3C/svg%3E" />
 <title>Bereikbaarheid Gent met de trein — Vlaamse Ardennen</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -363,12 +364,12 @@ function draw(){
   }
   stations.forEach(s=>{
     const key=s.serves>0&&s.train>0;
-    const m=key&&s.direct
+    const m=s.labeled
       ? L.marker(s.ll,{zIndexOffset:500,riseOnHover:true,icon:L.divIcon({className:'',iconSize:null,iconAnchor:[13,13],
           html:`<div class="hub"><span class="pin">${TRAIN}</span><span class="nm">${s.title}</span></div>`})})
       : L.marker(s.ll,{zIndexOffset:key?200:0,icon:L.divIcon({className:'',iconSize:[9,9],iconAnchor:[4.5,4.5],
           html:`<span class="halt${key?' key':''}"></span>`})})
-          .bindTooltip(s.title,{className:'plain',direction:'top',offset:[0,-5],permanent:key});
+          .bindTooltip(s.title,{className:'plain',direction:'top',offset:[0,-5]});
     if(s.train>0)m.bindPopup(()=>pop(s),{closeButton:false,offset:[0,-4]});
     s.marker=m;m.addTo(map);
   });

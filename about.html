@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23114b86'/%3E%3Cpath fill='%23fff' d='M12 4C9 4 7 4.4 7 6.6v6.6a2.4 2.4 0 0 0 2.4 2.4L8.4 16.6v.4h1.5l1.4-1.4h1.4L14.1 17h1.5v-.4l-1-1a2.4 2.4 0 0 0 2.4-2.4V6.6C17 4.4 15 4 12 4zM9.6 14a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm1.6-4.4H8.4V7.4h2.8zm1.6 0V7.4h2.8v2.2zm1.6 4.4a1 1 0 1 1 0-2 1 1 0 0 1 0 2z'/%3E%3C/svg%3E" />
 <title>Colofon — Bereikbaarheid Gent met de trein</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -78,7 +79,8 @@ tbody tr:nth-child(odd){background:rgba(17,75,134,.045)}
 .callout{border-left:4px solid #f79a35;background:rgba(247,154,53,.1);border-radius:0 10px 10px 0;
   padding:12px 16px;margin:14px 0;font-size:13px}
 .callout.win{border-left-color:#2f9e4f;background:rgba(47,158,79,.11)}
-.callout b{display:block;margin-bottom:2px}
+.callout b{display:inline}
+.callout>b:first-child{display:block;margin-bottom:2px}
 
 .ramp{display:flex;height:17px;border-radius:5px;overflow:hidden;border:1px solid rgba(0,0,0,.2);
   margin:10px 0 4px;max-width:420px}
@@ -305,10 +307,12 @@ markers    600   stations</code></pre>
   het wijzigen van de dekking puur hertekenen is — instant, zonder herberekening.</p>
 
   <h4>Labels ontwarren</h4>
-  <p>144 stations allemaal labelen geeft brij. Daarom krijgt een station pas een naamlabel als het
-  <i>voor minstens één hexagon het gekozen station is</i> én een rechtstreekse verbinding heeft. De rest
-  blijft een stip met tooltip. Dat reduceert vanzelf tot zo'n vijftien labels — ongeveer wat de originele
-  poster toont, maar nu afgeleid uit de data in plaats van met de hand gekozen.</p>
+  <p>144 stations allemaal labelen geeft brij. Een station komt daarom pas in aanmerking voor een naamlabel
+  als het <i>voor minstens één hexagon het dichtstbijzijnde station is</i> én een rechtstreekse verbinding
+  naar Gent heeft. Die kandidaten worden vervolgens gerangschikt op het aantal hexagonen dat ze bedienen,
+  en enkel de top 16 krijgt een pil met naam. Alle andere stations blijven een stip met tooltip, waarbij
+  bedienende stations een iets grotere stip krijgen. Zo kom je op ongeveer evenveel labels als de originele
+  poster — maar nu afgeleid uit de data in plaats van met de hand gekozen.</p>
 </section>
 
 <section class="card" id="valkuilen">
